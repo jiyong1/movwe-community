@@ -18,6 +18,8 @@ export default {
       currentPointerCard: null,
       timeoutFunc: null,
       currentModal: null,
+      sample1: '../image/sample.png',
+      sample2: '../image/sample2.jpg',
     }
   },
   methods: {
@@ -26,55 +28,80 @@ export default {
         clearTimeout(this.timeoutFunc);
       }
       if (this.currentPointerCard) {
+        if(this.currentPointerCard.parentNode.classList.contains('modal')) return;
         this.currentPointerCard.classList.remove('pointer-card');
       }
+      this.currentPointerCard = target;
       this.timeoutFunc = setTimeout(() => {
-        this.currentPointerCard = target;
         target.classList.add('pointer-card');
+        // const { top, left, width, height } = target.getBoundingClientRect();
+        // target.children[0].width = `${450}`;
       }, 700)
     },
     mouseLeave: function () {
-      if(this.timeoutFunc) clearTimeout(this.timeoutFunc);
-      if(this.currentPointerCard) {
+      if(!this.currentPointerCard) return;
+      else{
+        // console.log('leave')
+        if(this.currentPointerCard.parentNode.classList.contains('modal')) return;
+        if(this.timeoutFunc) clearTimeout(this.timeoutFunc);
         this.currentPointerCard.classList.remove('pointer-card');
         this.currentPointerCard = null;
+        
       }
     },
     modalOn: function (target) {
       this.currentModal = target;
-      target.classList.add('modal');
-      document.body.classList.add('modal-open')
+      const { top, left, width, height } = target.getBoundingClientRect();
+      console.log(top, left, width, height, top+(width-(width/1.5))/2);
+      target.style.transition = '0s';
+      target.style.position = 'absolute';
+      target.style.transform = 'scale(1)';
+      target.style.top = `${top}px`;
+      target.style.left = `${left}px`;
+      target.style.width = `${width}px`;
+      target.style.height = `${height}px`;
+      target.parentNode.classList.add('modal')
+      document.body.classList.add('modal-open');
+      setTimeout(() => {
+        const innerWidth = window.innerWidth;
+        target.style.transition = '.5s';
+        // target.children[0].style.transform = 'scale(1)';
+        target.style.top = '1.5rem';
+        if (innerWidth >= 820) {
+          target.style.left = `${innerWidth/2-400}px`;
+          target.style.width = '800px';
+        } else {
+          target.style.left = '12px';
+          target.style.width = `${innerWidth-24}px`;
+        }
+
+        
+      }, 100);
     },
     modalOff: function () {
       console.log('off!')
-      this.currentModal.classList.remove('modal');
-      this.currentModal = null;
+      this.currentModal.parentNode.scrollTo(0, 0);
+      this.currentModal.parentNode.classList.remove('modal');
       document.body.classList.remove('modal-open')
+      this.currentModal.style = "";
+      this.currentModal.classList.remove('pointer-card')
+      // console.log(this.currentModal.children[0]);
+      this.currentModal.children[0].style.transform = '';
+      this.currentModal = null;
+      this.currentPointerCard = null;
     },
-    // otherClick: function (e) {
-    //   if (!this.currentModal) return;
-    //   let target = e.target;
-    //   while (!target.nodeName === 'BODY') {
-    //     if(target == this.currentModal){
-    //       console.log('hi');
-    //       return;
-    //     }
-    //     target = target.parentNode;
-    //   }
-    //   this.modalOff();
-    // },
   },
-  // created: function () {
-  //   document.addEventListener('click', this.otherClick, true);
-  // },
-  // destroyed: function () {
-  //   document.removeEventListener('click', this.otherClick, true);
-  // }
 }
 </script>
 
-<style scoped>
+<style>
   .home {
-    /* height: 4000px; */
+    display: flex;
+    /* flex-direction: column; */
+    
+    height: 2000px;
   }
+  /* .modal-open .home {
+    overflow-y: scroll;
+  } */
 </style>
