@@ -1,17 +1,62 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link :to="{ name: 'Home' }">Home</router-link> |
-      <router-link :to="{ name: 'About' }">About</router-link> |
+      <h1>movwe</h1>
+      <div v-if="login">
+        <router-link :to="{ name: 'Home' }">Home</router-link> |
+        <router-link :to="{ name: 'About' }">About</router-link> |
+      </div>
+      <div v-else>
+        <div class="sign-btn" @click="goSignUp" v-if="this.$router.currentRoute.name === 'Login'">
+          회원가입
+        </div>
+        <div v-else class="sign-btn" @click="goLogin">
+          로그인
+        </div>
+      </div>
     </div>
     <router-view/>
   </div>
 </template>
 
+<script>
+
+export default {
+  computed: {
+    login: function () {
+      return this.$store.state.isLogin;
+    },
+  },
+  created: function () {
+    // this.$store.dispatch('getToken');
+    // if (!this.$store.state.isLogin) {
+    //   if (this.$router.currentRoute.name !== 'Login'){
+    //     this.$router.push({name: 'Login'})
+    //   }
+    // }
+  },
+  methods: {
+    goSignUp: function () {
+      this.$router.push({ name: 'SignUp' })
+    },
+    goLogin: function () {
+      this.$router.push({ name: 'Login' })
+    }
+  }
+}
+
+</script>
+
+
 <style>
+* {
+  box-sizing: border-box;
+}
 body {
   margin: 0;
-  background-color: black;
+  background-color: #222;
+  color: #e0dfdf;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 body.modal-open {
   overflow: hidden;
@@ -21,24 +66,46 @@ body.modal-open > #app {
 
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  /* text-align: center; */
   /* position: relative; */
 }
 
 #nav {
-  padding: 30px;
+  width: 100%;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  z-index: 10;
+}
+
+#nav > h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #BD9ACC
+}
+
+.sign-btn {
+  padding: .7em;
+  background: white;
+  border-radius: 2rem;
+  color: black;
+  cursor: pointer;
+  transition: .5s;
+  /* z-index: 10; */
+}
+
+.sign-btn:hover {
+  color: white;
+  background-color: black;
 }
 
 #nav a {
   font-weight: bold;
-  color: #2c3e50;
 }
 
 #nav a.router-link-exact-active {
-  color: #42b983;
+
 }
 </style>

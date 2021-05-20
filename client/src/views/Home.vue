@@ -98,8 +98,8 @@ export default {
   .home {
     display: flex;
     /* flex-direction: column; */
-    
-    height: 2000px;
+
+    /* height: 2000px; */
   }
   /* .modal-open .home {
     overflow-y: scroll;
