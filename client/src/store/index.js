@@ -110,6 +110,11 @@ export default new Vuex.Store({
       }
     }
   },
+  getters: {
+    popularMovieList: function (state) {
+      return state.movieList.slice(0, 20)
+    }
+  },
   modules: {
   }
 })

@@ -16,7 +16,7 @@ from django.db.models import Q
 # 인증 데이터가 제공되지 않았습니다. 같은 메세지를 보내줌
 @permission_classes([IsAuthenticated])
 def movie_list(request):
-    movies = get_list_or_404(Movie)
+    movies = get_list_or_404(Movie.objects.order_by('-popularity'))
     serializer = MovieListSerializer(movies, many=True, context={'user': request.user})
     return Response(serializer.data)
 

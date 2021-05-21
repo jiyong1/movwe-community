@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <router-view/>
+    <router-view style="padding-top: 100px;"/>
   </div>
 </template>
 
@@ -32,6 +32,10 @@ export default {
     if (!this.$store.state.isLogin) {
       if (this.$router.currentRoute.name !== 'Login'){
         this.$router.push({name: 'Login'})
+      }
+    } else {
+      if (this.$router.currentRoute.name !== 'Home'){
+        this.$router.push({name: 'Home'})
       }
     }
   },
@@ -82,6 +86,7 @@ body.modal-open > #app {
   align-items: center;
   position: fixed;
   z-index: 10;
+  background-color: #222;
 }
 
 #nav > h1 {
