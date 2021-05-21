@@ -12,11 +12,6 @@ export default {
   components: {
     SignUpForm
   },
-  methods: {
-    signup: function () {
-      this.$store.dispatch('signup')
-    }
-  }
 }
 </script>
 

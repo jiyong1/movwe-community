@@ -4,7 +4,7 @@
       <h1>movwe</h1>
       <div v-if="login">
         <router-link :to="{ name: 'Home' }">Home</router-link> |
-        <router-link :to="{ name: 'About' }">About</router-link> |
+        <div @click="logOut">로그아웃</div>
       </div>
       <div v-else>
         <div class="sign-btn" @click="goSignUp" v-if="this.$router.currentRoute.name === 'Login'">
@@ -28,18 +28,22 @@ export default {
     },
   },
   created: function () {
-    // this.$store.dispatch('getToken');
-    // if (!this.$store.state.isLogin) {
-    //   if (this.$router.currentRoute.name !== 'Login'){
-    //     this.$router.push({name: 'Login'})
-    //   }
-    // }
+    this.$store.dispatch('getToken');
+    if (!this.$store.state.isLogin) {
+      if (this.$router.currentRoute.name !== 'Login'){
+        this.$router.push({name: 'Login'})
+      }
+    }
   },
   methods: {
     goSignUp: function () {
       this.$router.push({ name: 'SignUp' })
     },
     goLogin: function () {
+      this.$router.push({ name: 'Login' })
+    },
+    logOut: function () {
+      this.$store.dispatch('logOut')
       this.$router.push({ name: 'Login' })
     }
   }

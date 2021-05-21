@@ -12,12 +12,6 @@ export default {
   components: {
     LoginForm
   },
-  methods: {
-    login: function (e) {
-
-      console.log(this.$store.dispatch('login', e.target));
-    }
-  }
 }
 </script>
 

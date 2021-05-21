@@ -1,7 +1,6 @@
 <template>
   <div class="home">
-    <MovieCard @mouse-enter="mouseEnter" @mouse-leave="mouseLeave" @modal-on="modalOn" @modal-off="modalOff"/>
-    <MovieCard @mouse-enter="mouseEnter" @mouse-leave="mouseLeave" @modal-on="modalOn" @modal-off="modalOff"/>
+    <MovieCard v-for="(movie, idx) in movieList" :key="idx" :movie="movie" @mouse-enter="mouseEnter" @mouse-leave="mouseLeave" @modal-on="modalOn" @modal-off="modalOff"/>
   </div>
 </template>
 
@@ -20,6 +19,11 @@ export default {
       currentModal: null,
       sample1: '../image/sample.png',
       sample2: '../image/sample2.jpg',
+    }
+  },
+  computed: {
+    movieList: function () {
+      return this.$store.state.movieList
     }
   },
   methods: {
@@ -91,15 +95,26 @@ export default {
       this.currentPointerCard = null;
     },
   },
+  created: function () {
+    this.$store.dispatch('getMovieList')
+    .catch(err => {
+      if(err.message === '401') {
+        alert('로그인 세션이 만료되었습니다.')
+        this.$store.dispatch('logOut')
+        this.$router.push({ name: 'Login' })
+      }
+    })
+  }
 }
 </script>
 
 <style>
   .home {
-    display: flex;
-    /* flex-direction: column; */
-
-    /* height: 2000px; */
+    display: grid;
+    padding-top: 80px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    /* overflow: hidden; */
   }
   /* .modal-open .home {
     overflow-y: scroll;

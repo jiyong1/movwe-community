@@ -13,6 +13,18 @@
 <script>
 export default {
   name: 'LoginForm',
+  methods: {
+    login: function (e) {
+      this.$store.dispatch('login', e.target)
+      .then(() => {
+        this.$router.push({ name : 'Home' })
+      })
+      .catch(err => {
+        alert(err.message);
+        e.target.username.focus();
+      })
+    }
+  }
 }
 </script>
 
