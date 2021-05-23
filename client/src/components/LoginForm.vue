@@ -38,6 +38,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  /* z-index: 100; */
 }
 .back-img {
   background-image: url('../assets/ticket.jpg');

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <div id="nav" :class="{unlogined : !login}">
       <h1>movwe</h1>
       <div v-if="login">
         <router-link :to="{ name: 'Home' }">Home</router-link> |
@@ -16,7 +16,11 @@
       </div>
     </div>
     <router-view style="padding-top: 100px;"/>
+    <footer v-if="login">
+      © 2021, movwe
+    </footer>
   </div>
+  
 </template>
 
 <script>
@@ -89,6 +93,10 @@ body.modal-open > #app {
   background-color: #222;
 }
 
+#nav.unlogined {
+  background-color: rgba(0, 0, 0, 0);
+}
+
 #nav > h1 {
   font-size: 2.5rem;
   font-weight: bold;
@@ -116,5 +124,15 @@ body.modal-open > #app {
 
 #nav a.router-link-exact-active {
 
+}
+
+footer {
+  width: 100%;
+  height: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  z-index: 0;
 }
 </style>

@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <MovieList :movies="popularMovies" />
+  <div class="home">
+    <MovieList :movies="popularMovies" :genre="''" />
+    <MovieList v-for="(genreObj, idx) in genreMoviesArray" :key="idx" :movies="randomList(genreObj.data)" :genre="genreObj.name" />
   </div>
 </template>
 
 <script>
 import MovieList from '@/components/MovieList.vue'
+import _ from 'lodash'
 
 export default {
   name: 'Home',
@@ -19,8 +21,11 @@ export default {
   },
   computed: {
     popularMovies: function () {
-      return this.$store.getters.popularMovieList
-    },
+      return this.$store.getters.popularMovieList.slice(0, 20)
+    },  
+    genreMoviesArray: function () {
+      return this.$store.getters.genreMoviesArray
+    }
   },
   methods: {
     resizeHandler: function () {
@@ -28,9 +33,20 @@ export default {
         item.style.marginLeft = `-${0}vw`;
       })
     },
+    randomList: function (movieList) {
+      return movieList.length > 20 ? _.sampleSize(movieList, 20) : _.sampleSize(movieList, movieList.length)
+    }
   },
   created: function () {
     this.$store.dispatch('getMovieList')
+    .catch(err => {
+      if(err.message === '401') {
+        alert('로그인 세션이 만료되었습니다.')
+        this.$store.dispatch('logOut')
+        this.$router.push({ name: 'Login' })
+      }
+    })
+    this.$store.dispatch('getGenreList')
     .catch(err => {
       if(err.message === '401') {
         alert('로그인 세션이 만료되었습니다.')
@@ -49,5 +65,7 @@ export default {
 </script>
 
 <style scoped>
-
+.home {
+  margin-bottom: 2rem;
+}
 </style>

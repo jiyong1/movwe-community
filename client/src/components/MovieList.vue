@@ -1,12 +1,15 @@
 <template>
-  <div class="card-list-container">
-    <div class="card-list">
-      <MovieCard v-for="(movie, idx) in movies" :key="idx" :movie="movie"/>
-    </div>
-    <button @click="moveLeft"><i class="fas fa-chevron-left"></i></button>
-    <button @click="moveRight"><i class="fas fa-chevron-right"></i></button>
-    <div class="circle-container" v-if="listLength" @click="circleClick">
-      <div class="circle" v-for="idx in listLength" :key="idx" :data-page="idx" :class="{ long: idx == currentMove+1 }"></div>
+  <div class="movie-list">
+    <h2 v-text="headerText"></h2>
+    <div class="card-list-container">
+      <div class="card-list">
+        <MovieCard v-for="(movie, idx) in movies" :key="idx" :movie="movie"/>
+      </div>
+      <button @click.capture="moveLeft" v-show="currentMove > 0"><div><i class="fas fa-chevron-left" @click="hi"></i></div></button>
+      <button @click.capture="moveRight" v-show="currentMove < listLength-1"><i class="fas fa-chevron-right"></i></button>
+      <div class="circle-container" v-if="listLength && myMoviesLength > listCount" @click="circleClick">
+        <div class="circle" v-for="idx in listLength" :key="idx" :data-page="idx" :class="{ long: idx == currentMove+1 }"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -21,12 +24,13 @@ export default {
   },
   props: {
     movies: Array,
-
+    genre: String,
   },
   data: function () {
     return {
       currentMove: 0,
       listCount: 0,
+      headerText: this.genre ? this.genre + ' 영화' : 'TOP 20 영화'
     }
   },
   computed: {
@@ -35,17 +39,22 @@ export default {
     },
     listLength: function () {
       let carou = this.movies.length / this.listCount
-      this.movies.length % this.listCount? 1 : 0;
+      carou += this.movies.length % this.listCount? 1 : 0;
       return parseInt(carou)
     }
   },
   methods: {
+    hi: function () {
+      console.log('hi');
+    },
     moveRight: function (e) {
+      e.stopPropagation();
       if (this.currentMove >= this.listLength-1) return;
       this.currentMove++;
       this.move(e.target);
     },
     moveLeft: function (e) {
+      e.stopPropagation();
       if (this.currentMove <= 0) return;
       this.currentMove--;
       this.move(e.target);
@@ -70,7 +79,9 @@ export default {
       this.getListCount();
     },
     circleClick: function (e) {
+      console.log('dd')
       if (e.target.matches('.circle')){
+        // console.log('dd')
         const page = e.target.dataset.page;
         this.currentMove = page-1;
         this.move(e.target.parentNode)
@@ -88,6 +99,14 @@ export default {
 </script>
 
 <style scoped>
+  .movie-list {
+    margin: 4rem 0;
+  }
+  h2 {
+    font-weight: bold;
+    font-size: 1.7rem;
+    margin: 2vw;
+  }
   .card-list-container {
     overflow: hidden;
     position: relative;
@@ -107,6 +126,7 @@ export default {
     color: white;
     font-size: 2rem;
     opacity: 0;
+    padding: 0;
   }
   .card-list-container:hover > button {
     opacity: 1;
@@ -123,28 +143,22 @@ export default {
     .card-list-container > button {
       height: 31.5vw;
     }
- }
-
- @media (max-width: 1000px) {
-    .card-list-container > button {
-      height: calc((88vw/3)/2*3);
-    }
-
- }
-
- @media (max-width: 800px) {
-    .card-list-container > button {
-      height: 69vw;
-    }
-   
- }
-
+  }
+  @media (max-width: 1000px) {
+      .card-list-container > button {
+        height: calc((88vw/3)/2*3);
+      }
+  }
+  @media (max-width: 800px) {
+      .card-list-container > button {
+        height: 69vw;
+      }
+  }
   .circle-container {
     display: flex;
     justify-content: center;
     align-items: center;
   }
-
   .circle {
     cursor: pointer;
     width: 15px;
@@ -154,12 +168,8 @@ export default {
     margin: 1rem .5rem;
     transition: .5s;
   }
-
   .circle.long {
     width: 50px;
     background-color: #ddd;
   }
-  /* .modal-open .home {
-    overflow-y: scroll;
-  } */
 </style>

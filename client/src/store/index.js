@@ -9,6 +9,7 @@ export default new Vuex.Store({
     jwtToken: '',
     API_ENDPOINT: 'http://127.0.0.1:8000/',
     movieList: [],
+    genreList: [],
   },
   mutations: {
     TOKEN: function (state, jwtToken) {
@@ -30,6 +31,9 @@ export default new Vuex.Store({
     },
     SET_MOVIE_LIST (state, data) {
       state.movieList = data;
+    },
+    SET_GENRE_LIST (state, data) {
+      state.genreList = data;
     }
   },
   actions: {
@@ -108,11 +112,49 @@ export default new Vuex.Store({
           throw new Error(res.status)
         }
       }
+    },
+    getGenreList: async function (context) {
+      if (context.state.movieList.length > 0) {
+        return
+      } else {
+        const url = context.state.API_ENDPOINT + 'api/v1/genres/'
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': 'JWT ' + context.state.jwtToken
+          }
+        })
+        if (res.status === 200) {
+          const resdata = await res.json()
+          context.commit('SET_GENRE_LIST', resdata)
+        } else {
+          throw new Error(res.status)
+        }
+      }
     }
   },
   getters: {
     popularMovieList: function (state) {
-      return state.movieList.slice(0, 20)
+      return state.movieList
+    },
+    genreMoviesArray: function (state) {
+      const returnArray = []
+      state.genreList.forEach(genre => {
+        const genreMovies = {
+          name: genre.name,
+          data: [],
+        }
+        state.movieList.forEach(movie => {
+          for (let i = 0; i < movie.genres.length; i++) {
+            if (movie.genres[i].id === genre.id) {
+              genreMovies.data.push(movie);
+              break;
+            }
+          }
+        })
+        if(genreMovies.data.length > 0) returnArray.push(genreMovies);
+      })
+      return returnArray;
     }
   },
   modules: {

@@ -1,8 +1,11 @@
 <template>
   <div class="card-root">
-    <div class="card-container" >
+    <div class="card-container">
       <img :src="movie.poster_path" alt="포스터 이미지">
-
+      <!-- <div class="detail">
+        <img :src="movie.poster_path" alt="포스터 이미지">
+        <h3>{{ movie.title }}</h3>
+      </div> -->
     </div>
   </div>
 </template>
@@ -17,30 +20,12 @@ export default {
 
   },
   methods: {
-    // mouseEnter: function (e) {
-    //   const target = this.getContainer(e.target)
-    //   if(target.classList.contains('modal')) return;
-    //   this.$emit('mouse-enter', target);
-    // },
-    // mouseLeave: function (e) {
-    //   const target = this.getContainer(e.target)
-    //   if(target.classList.contains('modal')) return;
-    //   this.$emit('mouse-leave')
-    // },
-    // modalOn: function (e) {
-    //   const target = this.getContainer(e.target)
-    //   this.$emit('modal-on', target);
-    // },
-    // getContainer: function (target) {
-    //   while (!target.classList.contains('card-container')) target = target.parentNode
-    //   return target;
-    // },
-    // modalOff: function (e) {
-    //   if (e.target.classList.contains('modal')) {
-    //     e.stopPropagation();
-    //     this.$emit('modal-off');
-    //   }
-    // }
+    mouseEnter: function (e) {
+      console.log(e.target.childNodes[1])
+    },
+    mouseLeave: function (e) {
+      e.target.style = ""
+    }
   }
 }
 </script>
@@ -59,6 +44,16 @@ export default {
  }
  .card-root {
    margin: 0 2vw;
+   position: relative;
+ }
+
+ .detail {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   opacity: 0;
  }
  
  @media (max-width: 1200px) {
