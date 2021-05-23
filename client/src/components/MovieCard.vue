@@ -1,5 +1,5 @@
 <template>
-  <div class="card-root" @click.capture="modalOff">
+  <div class="card-root">
     <div class="card-container" >
       <img :src="movie.poster_path" alt="포스터 이미지">
 
