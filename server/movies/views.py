@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from .models import Movie, Review, Comment, Rank, Genre
-from .serializers import MovieListSerializer, ReviewSerializer, CommentSerializer, ReviewDetailSerializer
+from .serializers import MovieListSerializer, ReviewSerializer, CommentSerializer, ReviewDetailSerializer, GenreSerializer
 from django.db.models import Q
 
 @api_view(['GET'])
@@ -20,6 +20,13 @@ def movie_list(request):
     serializer = MovieListSerializer(movies, many=True, context={'user': request.user})
     return Response(serializer.data)
 
+@api_view(['GET'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def movie_genres(request):
+    genres = get_list_or_404(Genre)
+    serializer = GenreSerializer(genres, many=True, context={'user': request.user})
+    return Response(serializer.data)
 
 @api_view(['GET', 'POST'])
 @authentication_classes([JSONWebTokenAuthentication])
