@@ -10,6 +10,8 @@ export default new Vuex.Store({
     API_ENDPOINT: 'http://127.0.0.1:8000/',
     movieList: [],
     genreList: [],
+    pendingTimeOut: null,
+    scaleCard: null,
   },
   mutations: {
     TOKEN: function (state, jwtToken) {
@@ -34,6 +36,27 @@ export default new Vuex.Store({
     },
     SET_GENRE_LIST (state, data) {
       state.genreList = data;
+    },
+    REMOVE_TIME_OUT (state) {
+      clearTimeout(state.pendingTimeOut);
+      state.pendingTimeOut = null;
+    },
+    SET_SCALE_CARD (state, target) {
+      state.scaleCard = target;
+    },
+    REMOVE_SCALE_CARD (state) {
+      const { width, height } = state.scaleCard.getBoundingClientRect(); 
+      state.scaleCard.childNodes[1].style.top = `0px`;
+      state.scaleCard.childNodes[1].style.left = `0px`;
+      state.scaleCard.childNodes[1].style.width = `${width}px`;
+      state.scaleCard.childNodes[1].style.height = `${height}px`;
+      state.scaleCard.childNodes[1].style.opacity = '0';
+      state.scaleCard.childNodes[1].firstChild.firstChild.src = '';
+      setTimeout(() => {
+        state.scaleCard.classList.remove('scaleUp');
+        state.scaleCard.childNodes[1].style = '';
+        state.scaleCard = null;
+      }, 500)
     }
   },
   actions: {
@@ -130,6 +153,34 @@ export default new Vuex.Store({
         } else {
           throw new Error(res.status)
         }
+      }
+    },
+    mouseEnter: function (context, target) {
+      if (context.state.pendingTimeOut) {
+        context.commit('REMOVE_TIME_OUT')
+      }
+      context.state.pendingTimeOut = setTimeout(() => {
+        target.classList.add('scaleUp')
+        context.commit('SET_SCALE_CARD', target)
+        const detail = target.childNodes[1];
+        const {left, width, height } = target.getBoundingClientRect()
+        const moveTop = - (height*1.5 - height) / 2
+        let moveLeft = - (width*1.5 - width) / 2
+        if (moveLeft + left < 0) moveLeft = 0
+        else if (left + moveLeft + width*1.5 > window.innerWidth) moveLeft = -(width*1.5 - width)
+        detail.style.top = `${moveTop}px`;
+        detail.style.left = `${moveLeft}px`;
+        detail.style.width = `${width*1.5}px`;
+        detail.style.height = `${height*1.5}px`;
+        detail.firstChild.firstChild.src = detail.firstChild.firstChild.dataset.src;
+      }, 700);
+    },
+    mouseLeave: function (context) {
+      if (context.state.pendingTimeOut) {
+        context.commit('REMOVE_TIME_OUT')
+      }
+      if (context.state.scaleCard) {
+        context.commit('REMOVE_SCALE_CARD')
       }
     }
   },

@@ -5,7 +5,7 @@
       <div class="card-list">
         <MovieCard v-for="(movie, idx) in movies" :key="idx" :movie="movie"/>
       </div>
-      <button @click.capture="moveLeft" v-show="currentMove > 0"><div><i class="fas fa-chevron-left" @click="hi"></i></div></button>
+      <button @click.capture="moveLeft" v-show="currentMove > 0"><i class="fas fa-chevron-left"></i></button>
       <button @click.capture="moveRight" v-show="currentMove < listLength-1"><i class="fas fa-chevron-right"></i></button>
       <div class="circle-container" v-if="listLength && myMoviesLength > listCount" @click="circleClick">
         <div class="circle" v-for="idx in listLength" :key="idx" :data-page="idx" :class="{ long: idx == currentMove+1 }"></div>
@@ -44,9 +44,6 @@ export default {
     }
   },
   methods: {
-    hi: function () {
-      console.log('hi');
-    },
     moveRight: function (e) {
       e.stopPropagation();
       if (this.currentMove >= this.listLength-1) return;
@@ -79,9 +76,7 @@ export default {
       this.getListCount();
     },
     circleClick: function (e) {
-      console.log('dd')
       if (e.target.matches('.circle')){
-        // console.log('dd')
         const page = e.target.dataset.page;
         this.currentMove = page-1;
         this.move(e.target.parentNode)
@@ -108,7 +103,7 @@ export default {
     margin: 2vw;
   }
   .card-list-container {
-    overflow: hidden;
+    /* overflow: hidden; */
     position: relative;
   }
   .card-list {
@@ -138,7 +133,9 @@ export default {
   .card-list-container > button:nth-of-type(2) {
     right: 0;
   }
-
+  button > i {
+    pointer-events: none;
+  } 
   @media (max-width: 1200px) {
     .card-list-container > button {
       height: 31.5vw;

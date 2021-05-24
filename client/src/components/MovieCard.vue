@@ -1,11 +1,19 @@
 <template>
   <div class="card-root">
-    <div class="card-container">
+    <div class="card-container" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
       <img :src="movie.poster_path" alt="포스터 이미지">
-      <!-- <div class="detail">
-        <img :src="movie.poster_path" alt="포스터 이미지">
-        <h3>{{ movie.title }}</h3>
-      </div> -->
+      <div class="detail">
+        <div class="video-container">
+          <iframe :data-src="videoSrc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+        <div class="detail-description">
+          <h3>{{ movie.title }}</h3>
+          <div class="button-container">
+            <button><i class="fas fa-plus"></i></button>
+            <button><i class="fas fa-info"></i></button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -16,15 +24,20 @@ export default {
   props: {
     movie: Object
   },
+  data: function () {
+    return {
+      videoSrc: 'https://www.youtube.com/embed/' + this.movie.trailer + '?autoplay=1&mute=1'
+    }
+  },
   computed: {
 
   },
   methods: {
     mouseEnter: function (e) {
-      console.log(e.target.childNodes[1])
+      this.$store.dispatch('mouseEnter', e.target);
     },
-    mouseLeave: function (e) {
-      e.target.style = ""
+    mouseLeave: function () {
+      this.$store.dispatch('mouseLeave')
     }
   }
 }
@@ -49,11 +62,34 @@ export default {
 
  .detail {
    position: absolute;
+   display: none;
    top: 0;
    left: 0;
    width: 100%;
-   height: 100%;
-   opacity: 0;
+   background: black;
+   border-radius: 12px;
+   transition: .5s;
+   z-index: 1000;
+ }
+ .detail h3 {
+   font-size: 1.3rem;
+ }
+
+  .detail > .video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+  }
+
+  .video-container > iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+ .scaleUp > .detail {
+   display: flex;
+   flex-direction: column;
  }
  
  @media (max-width: 1200px) {

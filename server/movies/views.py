@@ -77,6 +77,7 @@ def movie_rank(request, movie_pk):
 
     # 수정
     if request.method == 'PUT':
+        # 이 영화의 랭크를 이 유저가 매겼는지?
         if not movie.rank_set.all().filter(user=user).exists():
             data = {
                 'message': '평점을 먼저 매겨야 합니다.'
