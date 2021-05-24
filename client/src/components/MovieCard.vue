@@ -1,16 +1,21 @@
 <template>
   <div class="card-root">
-    <div class="card-container" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
+    <div class="card-container" @mouseenter="mouseEnter" @mouseleave="mouseLeave" :data-movie="movie.id">
       <img :src="movie.poster_path" alt="포스터 이미지">
       <div class="detail">
         <div class="video-container">
           <iframe :data-src="videoSrc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
         </div>
         <div class="detail-description">
-          <h3>{{ movie.title }}</h3>
-          <div class="button-container">
-            <button><i class="fas fa-plus"></i></button>
-            <button><i class="fas fa-info"></i></button>
+          <div class="header">
+            <h3>{{ movie.title }}</h3>
+            <div class="button-container">
+              <button @click="pickClick">
+                <i class="fas fa-check" v-if="movie.user_picked"></i>
+                <i class="fas fa-plus" v-else></i>
+              </button>
+              <button @click="modalOpen"><i class="fas fa-info"></i></button>
+            </div>
           </div>
         </div>
       </div>
@@ -38,6 +43,12 @@ export default {
     },
     mouseLeave: function () {
       this.$store.dispatch('mouseLeave')
+    },
+    pickClick: function () {
+      this.$store.dispatch('pickClick', this.movie.id)
+    },
+    modalOpen: function() {
+      this.$store.dispatch('modalOpen')
     }
   }
 }
@@ -56,7 +67,11 @@ export default {
     object-fit: cover;
  }
  .card-root {
+   width: 16vw;
    margin: 0 2vw;
+   /* position: relative; */
+ }
+ .card-container {
    position: relative;
  }
 
@@ -66,6 +81,7 @@ export default {
    top: 0;
    left: 0;
    width: 100%;
+   height: 100%;
    background: black;
    border-radius: 12px;
    transition: .5s;
@@ -73,6 +89,7 @@ export default {
  }
  .detail h3 {
    font-size: 1.3rem;
+   margin-left: 10px;
  }
 
   .detail > .video-container {
@@ -91,6 +108,39 @@ export default {
    display: flex;
    flex-direction: column;
  }
+
+ .detail-description {
+   margin: auto 0;
+ }
+ .detail-description > .header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+ }
+  .button-container {
+    min-width: 30%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .button-container > button {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    border: 3px #e0dfdf solid;
+    color: inherit;
+    border-radius: 50%;
+    background: inherit;
+  }
+
+  .button-container > button:hover {
+    color: #222;
+    background: #e0dfdf;
+  }
+
+  .button-container > button > i {
+    pointer-events: none;
+  }
  
  @media (max-width: 1200px) {
     img {
@@ -98,23 +148,32 @@ export default {
       width: 21vw;
       height: 31.5vw;
     }
+    .card-root {
+      width: 21vw;
+    }
  }
 
  @media (max-width: 1000px) {
-   img {
-     /* 3개 */
-     width: calc(88vw/3);
-     height: calc((88vw/3)/2*3);
-   }
+    img {
+      /* 3개 */
+      width: calc(88vw/3);
+      height: calc((88vw/3)/2*3);
+    }
+    .card-root {
+      width: calc(88vw/3);
+    }
 
  }
 
  @media (max-width: 800px) {
-   img {
-     /* 2 */
-     width: 46vw;
-     height: 69vw;
-   }
+    img {
+      /* 2 */
+      width: 46vw;
+      height: 69vw;
+    }
+    .card-root {
+      width: 46vw;
+    }
    
  }
 

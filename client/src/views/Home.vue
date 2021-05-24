@@ -2,17 +2,20 @@
   <div class="home">
     <MovieList :movies="popularMovies" :genre="''" />
     <MovieList v-for="(genreObj, idx) in genreMoviesArray" :key="idx" :movies="randomList(genreObj.data)" :genre="genreObj.name" />
+    <Modal v-if="modalCard" />
   </div>
 </template>
 
 <script>
 import MovieList from '@/components/MovieList.vue'
 import _ from 'lodash'
+import Modal from '@/components/Modal.vue'
 
 export default {
   name: 'Home',
   components: {
     MovieList,
+    Modal
   },
   data: function () {
     return {
@@ -25,6 +28,9 @@ export default {
     },  
     genreMoviesArray: function () {
       return this.$store.getters.genreMoviesArray
+    },
+    modalCard: function () {
+      return this.$store.state.modalCard
     }
   },
   methods: {

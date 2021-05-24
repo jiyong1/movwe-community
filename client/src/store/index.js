@@ -12,6 +12,7 @@ export default new Vuex.Store({
     genreList: [],
     pendingTimeOut: null,
     scaleCard: null,
+    modalCard: null,
   },
   mutations: {
     TOKEN: function (state, jwtToken) {
@@ -45,7 +46,7 @@ export default new Vuex.Store({
       state.scaleCard = target;
     },
     REMOVE_SCALE_CARD (state) {
-      const { width, height } = state.scaleCard.getBoundingClientRect(); 
+      const { width, height } = state.scaleCard.getBoundingClientRect();
       state.scaleCard.childNodes[1].style.top = `0px`;
       state.scaleCard.childNodes[1].style.left = `0px`;
       state.scaleCard.childNodes[1].style.width = `${width}px`;
@@ -53,10 +54,26 @@ export default new Vuex.Store({
       state.scaleCard.childNodes[1].style.opacity = '0';
       state.scaleCard.childNodes[1].firstChild.firstChild.src = '';
       setTimeout(() => {
+        if (!state.scaleCard) return;
         state.scaleCard.classList.remove('scaleUp');
         state.scaleCard.childNodes[1].style = '';
-        state.scaleCard = null;
+        state.scaleCard = null; 
       }, 500)
+    },
+    PICK_CHANGE (state, movieID) {
+      for (let i=0; i < state.movieList.length; i++) {
+        const movie = state.movieList[i]
+        if (movie.id === movieID) {
+          movie.user_picked = !movie.user_picked
+          return;
+        }
+      }
+    },
+    MODAL_OPEN (state, data) {
+      state.modalCard = data;
+    },
+    MODAL_OFF (state) {
+      state.modalCard = null;
     }
   },
   actions: {
@@ -155,6 +172,20 @@ export default new Vuex.Store({
         }
       }
     },
+    pickClick: async function(context, movieID) {
+      const url = context.state.API_ENDPOINT + `api/v1/movie/${movieID}/pick/`
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        }
+      })
+      if (res.status === 200) {
+        context.commit('PICK_CHANGE', movieID);
+      } else {
+        throw new Error(res.status)
+      }
+    },
     mouseEnter: function (context, target) {
       if (context.state.pendingTimeOut) {
         context.commit('REMOVE_TIME_OUT')
@@ -168,10 +199,10 @@ export default new Vuex.Store({
         let moveLeft = - (width*1.5 - width) / 2
         if (moveLeft + left < 0) moveLeft = 0
         else if (left + moveLeft + width*1.5 > window.innerWidth) moveLeft = -(width*1.5 - width)
-        detail.style.top = `${moveTop}px`;
-        detail.style.left = `${moveLeft}px`;
         detail.style.width = `${width*1.5}px`;
         detail.style.height = `${height*1.5}px`;
+        detail.style.top = `${moveTop}px`;
+        detail.style.left = `${moveLeft}px`;
         detail.firstChild.firstChild.src = detail.firstChild.firstChild.dataset.src;
       }, 700);
     },
@@ -182,7 +213,17 @@ export default new Vuex.Store({
       if (context.state.scaleCard) {
         context.commit('REMOVE_SCALE_CARD')
       }
-    }
+    },
+    modalOpen: function (context) {
+      if (context.state.scaleCard) {
+        const movieID = context.state.scaleCard.dataset.movie
+        context.commit('MODAL_OPEN', movieID)
+      }
+    },
+    modalOff: function (context) {
+      context.commit('MODAL_OFF')
+    },
+    // starRate: async function (context)
   },
   getters: {
     popularMovieList: function (state) {

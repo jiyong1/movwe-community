@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="{ modal: modalOpened}">
     <div id="nav" :class="{unlogined : !login}">
       <h1>movwe</h1>
       <div v-if="login">
@@ -30,6 +30,15 @@ export default {
     login: function () {
       return this.$store.state.isLogin;
     },
+    modalOpened: function () {
+      if (this.$store.state.modalCard) {
+        document.body.classList.add('modal-open')
+        return true;
+      } else {
+        document.body.classList.remove('modal-open')
+        return false;
+      }
+    }
   },
   created: function () {
     this.$store.dispatch('getToken');
