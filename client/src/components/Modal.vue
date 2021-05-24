@@ -5,13 +5,29 @@
         <div class="video-container">
           <iframe :src="videoSrc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
         </div>
-        <h3>{{ movie.title }}</h3>
-        <p>{{ movie.overview }}</p>
-        <h4>리뷰 목록</h4>
+        <div class="movie-info">
+            <h3>{{ movie.title }}</h3>
+            <p>{{ movie.overview }}</p>
+        </div>
+        <div class="review-header">
+            <h4>리뷰 목록</h4>
+            <button class="btn form-open" @click="openForm">리뷰 작성</button>
+        </div>
+        <div class="form-container">
+            <form class="review-form">
+                <input type="text">
+                <textarea name="" id="" cols="30"></textarea>
+            </form>
+            <div class="close-container">
+                <div class="pin"></div>
+                <button class="btn" @click="closeForm"><i class="fas fa-chevron-up"></i></button>
+            </div>
+        </div>
         <div v-if="reviews.length">
             <div v-for="(review, idx) in reviews" :key="idx">{{ review.title }}</div>
         </div>
         <h4 v-else>아직 작성된 리뷰가 없습니다.</h4>
+        
       </div>
       <div class="loading" v-else>
           <div class="circle"></div>
@@ -42,6 +58,20 @@ export default {
         if (e.target.matches('.background')){
             this.$store.dispatch('modalOff');
         }
+    },
+    openForm: function () {
+        const formContainer = document.querySelector('.form-container');
+        let height = 0;
+        formContainer.childNodes.forEach(node => {
+            height += node.getBoundingClientRect().height;
+        })
+        formContainer.style.height = `${height}px`;
+        formContainer.classList.add('open');
+    },
+    closeForm: function () {
+        const formContainer = document.querySelector('.form-container');
+        formContainer.style.height = `0`;
+        formContainer.classList.remove('open');
     }
   },
   created: function () {
@@ -62,6 +92,9 @@ export default {
             alert('로그인 세션이 만료되었습니다.')
             this.$store.dispatch('logOut')
             this.$router.push({ name: 'Login' })
+        } else if(err.message === '404') {
+            alert('존재하지 않는 영화입니다.')
+            this.$router.push({ name : 'Home' })
         } else {
             alert('알 수 없는 오류입니다.')
         }
@@ -76,7 +109,7 @@ export default {
     article.style.width = `${width}px`
     article.style.height = `${height}px`
     setTimeout(() => {
-        article.style.transition = '.5s';
+        article.style.transition = '.4s';
         let bwidth;
         let bleft;
         if (window.innerWidth - 6*16 > 1200) {
@@ -84,7 +117,7 @@ export default {
             bleft = (window.innerWidth - 1200) / 2
         } else {
             bwidth = window.innerWidth - 6*16
-            bleft = '3rem';
+            bleft = 3*16;
         }
         article.style.top = `1rem`;
         article.style.left = `${bleft}px`;
@@ -113,7 +146,7 @@ export default {
     .article {
         width: 100%;
         max-width: 1200px;
-        background-color: black;
+        background-color: #222;
         border-radius: 10px;
         margin: 0 auto;
         color: white;
@@ -141,7 +174,7 @@ export default {
     }
     .article-content {
         width: 100%;
-        padding: .5rem;
+        padding: 1rem;
     }
     .video-container {
         position: relative;
@@ -153,22 +186,112 @@ export default {
         width: 100%;
         height: 100%;
     }
-    .article-content > h3{
+    .movie-info {
+        margin: 1rem;
+    }
+    .movie-info > h3{
         font-size: 2rem;
         text-align: center;
         margin: 1em 0;
         font-weight: bold;
     }
-    .article-content > p{
+    .movie-info > p{
         font-size: 1.2rem;
+        line-height: 1.5;
     }
-    .article-content > h4{
+    
+    h4{
         font-size: 1.6rem;
-        text-align: center;
         margin: 1em 0;
         font-weight: bold;
     }
+    .article-content > h4 {
+        text-align: center;
+    }
+    .article-content > * {
+        z-index: 1;
+    }
+    .form-container {
+        overflow: hidden;
+        z-index: 0;
+        height: 0;
+        transition: .5s;
+    }
+    .form-container > * {
+        transform: translate3d(0, -100%, 0);
+        transition: .5s;
+    }
+    .review-form {
+        padding: 1rem;
+    }
+    .review-form > textarea,
+    .review-form > input {
+        width: 100%;
+        border-radius: 10px;
+        margin: .5rem 0;
+        font-size: 1.3rem;
+    }
+    .review-form > input {
+        height: 2rem;
+    }
+    .review-form > *:focus {
+        outline: none;
+    }
+    
+    .open > * {
+        transform: translate3d(0, 0, 0);
+    }
+    .review-header {
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+    .btn {
+        border: none;
+        background-color: white;
+        color: #222;
+        font-size: 1rem;
+        padding: .3rem;
+        border-radius: 100px;
+        transition: .5s;
+        font-weight: 700;
+    }
+    .btn.form-open {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        bottom: auto;
+        transition: 0s;
+        transform: translate3d(0, -50%, 0);
+    }
 
+    .btn:hover {
+        background-color: black;
+        color: white;
+    }
+    button > i {
+        pointer-events: none;
+    }
+    .close-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+    .close-container > .pin {
+        position: absolute;
+        width: 100%;
+        border: 1px solid white;
+        top: 50%;
+        transform: translate3d(0, -50%, 0);
+        z-index: 0;
+    }
+    .close-container > .btn {
+        z-index: 100;
+        border-radius: 50%;
+        font-size: 20px;
+        width: 40px;
+        height: 40px;
+    }
 
     @keyframes circleMove {
         from {
