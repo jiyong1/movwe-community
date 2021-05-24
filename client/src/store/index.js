@@ -12,7 +12,7 @@ export default new Vuex.Store({
     genreList: [],
     pendingTimeOut: null,
     scaleCard: null,
-    modalCard: null,
+    modalMovieId: null,
   },
   mutations: {
     TOKEN: function (state, jwtToken) {
@@ -70,10 +70,10 @@ export default new Vuex.Store({
       }
     },
     MODAL_OPEN (state, data) {
-      state.modalCard = data;
+      state.modalMovieId = data;
     },
     MODAL_OFF (state) {
-      state.modalCard = null;
+      state.modalMovieId = null;
     }
   },
   actions: {
@@ -223,6 +223,21 @@ export default new Vuex.Store({
     modalOff: function (context) {
       context.commit('MODAL_OFF')
     },
+    getReviewList: async function(context, movieID) {
+      const url = context.state.API_ENDPOINT + `api/v1/movie/${movieID}/review/`
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        }
+      })
+      if (res.status === 200) {
+        const data = await res.json()
+        return data
+      } else {
+        throw new Error(res.status)
+      }
+    }
     // starRate: async function (context)
   },
   getters: {
@@ -230,6 +245,7 @@ export default new Vuex.Store({
       return state.movieList
     },
     genreMoviesArray: function (state) {
+      console.log('hi')
       const returnArray = []
       state.genreList.forEach(genre => {
         const genreMovies = {

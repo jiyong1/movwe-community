@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <MovieList :movies="popularMovies" :genre="''" />
-    <MovieList v-for="(genreObj, idx) in genreMoviesArray" :key="idx" :movies="randomList(genreObj.data)" :genre="genreObj.name" />
-    <Modal v-if="modalCard" />
+    <MovieList v-for="(genreObj, idx) in genreMovies" :key="idx" :movies="genreObj.data" :genre="genreObj.name" />
+    <Modal v-if="modalMovieId" />
   </div>
 </template>
 
@@ -29,8 +29,16 @@ export default {
     genreMoviesArray: function () {
       return this.$store.getters.genreMoviesArray
     },
-    modalCard: function () {
-      return this.$store.state.modalCard
+    modalMovieId: function () {
+      return this.$store.state.modalMovieId
+    },
+    genreMovies: function () {
+      return this.genreMoviesArray.map(item => {
+        return {
+          name: item.name,
+          data: this.randomList(item.data)
+        }
+      })
     }
   },
   methods: {

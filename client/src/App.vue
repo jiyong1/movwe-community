@@ -31,7 +31,7 @@ export default {
       return this.$store.state.isLogin;
     },
     modalOpened: function () {
-      if (this.$store.state.modalCard) {
+      if (this.$store.state.modalMovieId) {
         document.body.classList.add('modal-open')
         return true;
       } else {
