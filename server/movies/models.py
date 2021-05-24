@@ -11,8 +11,9 @@ class Movie(models.Model):
     popularity = models.FloatField()
     vote_count = models.IntegerField()
     vote_average = models.FloatField()
-    overview = models.TextField()
+    overview = models.TextField(blank=True)
     poster_path = models.CharField(max_length=200)
+    trailer = models.CharField(max_length=200)
     genres = models.ManyToManyField(Genre)
     picked = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='pick')
 
