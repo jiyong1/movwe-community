@@ -129,6 +129,7 @@ export default {
         }
     },
     created: function () {
+        this.$store.dispatch('modalOff')
         const reviewId = this.$route.params.id
         this.$store.dispatch('getReviewDetail', reviewId)
         .then(res => {

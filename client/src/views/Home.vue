@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div v-if="loadPopularMovieList && loadGenreList">
-      <MovieList :movies="popularMovies" :genre="''" />
+      <MovieList :movies="popularMovies" />
       <MovieList v-for="(genreObj, idx) in genreMovies" :key="idx" :movies="genreObj.data" :genre="genreObj.name" />
       <Modal v-if="modalMovieId" />
     </div>
@@ -96,6 +96,7 @@ export default {
 <style scoped>
 .home {
   margin-bottom: 2rem;
+  overflow-x: hidden;
 }
 
 </style>

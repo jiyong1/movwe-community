@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Login from '../views/accounts/Login.vue'
 import SignUp from '../views/accounts/SignUp.vue'
 import Review from '../views/Review.vue'
+import Genre from '../views/Genre.vue'
 
 Vue.use(VueRouter)
 
@@ -27,6 +28,11 @@ const routes = [
     path: '/review/:id',
     name: 'Review',
     component: Review
+  },
+  {
+    path: '/genre/:name',
+    name: 'Genre',
+    component: Genre
   },
 ]
 

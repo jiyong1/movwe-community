@@ -1,6 +1,16 @@
 <template>
   <div class="movie-list">
-    <h2 v-text="headerText"></h2>
+    <div class="movie-list-header">
+      <h2 v-text="headerText"></h2>
+      <div v-if="genre" class="detail-button" @click="goGenreDetail">
+        <div class="detail-button-text">
+          전체 보기
+        </div>
+        <div class="arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
     <div class="card-list-container">
       <div class="card-list">
         <MovieCard v-for="(movie, idx) in movies" :key="idx" :movie="movie"/>
@@ -24,7 +34,11 @@ export default {
   },
   props: {
     movies: Array,
-    genre: String,
+    genre: {
+      type: String,
+      default: ''
+    },
+    
   },
   data: function () {
     return {
@@ -81,6 +95,9 @@ export default {
         this.currentMove = page-1;
         this.move(e.target.parentNode)
       }
+    },
+    goGenreDetail: function () {
+      this.$router.push({ name: 'Genre', params: { name: this.genre } })
     }
   },
   mounted: function () {
@@ -97,13 +114,42 @@ export default {
   .movie-list {
     margin: 4rem 0;
   }
+  .movie-list-header {
+    margin: 2vw;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .detail-button {
+    opacity: 0;
+    transition: .5s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .detail-button-text {
+    font-size: 1.2rem;
+    margin-right: .5em;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  .movie-list-header:hover .detail-button-text {
+    width: auto;
+    height: auto;
+  }
+  .movie-list:hover .detail-button {
+    opacity: 1;
+  }
+  .movie-list-header .arrow {
+    font-size: 1.3rem;
+  }
   h2 {
     font-weight: bold;
     font-size: 1.7rem;
-    margin: 2vw;
+    margin-right: .5rem;
   }
   .card-list-container {
-    /* overflow: hidden; */
     position: relative;
   }
   .card-list {
