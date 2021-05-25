@@ -58,12 +58,13 @@ def movie_review(request, movie_pk):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
     
-@api_view(['POST', 'PUT', 'GET'])
+@api_view(['POST', 'GET'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
 def movie_rank(request, movie_pk):
     user = request.user
     movie = get_object_or_404(Movie, pk=movie_pk)
+    print('-------here-------', request.data)
     number = request.data['rank']
     # 범위 검사
     if not (1 <= int(number) <= 10):
@@ -75,15 +76,12 @@ def movie_rank(request, movie_pk):
     origin_vote_count = movie.vote_count
     origin_vote_average = movie.vote_average
 
+
     # 수정
-    if request.method == 'PUT':
-        # 이 영화의 랭크를 이 유저가 매겼는지?
-        if not movie.rank_set.all().filter(user=user).exists():
-            data = {
-                'message': '평점을 먼저 매겨야 합니다.'
-            }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        rank = movie.rank_set.all().get(user=user)
+    # 이 영화의 랭크를 이 유저가 매겼는지?
+    if movie.rank_set.filter(user=user).exists():
+            
+        rank = movie.rank_set.get(user=user)
         # print('-------here-------', request.data['rank'])
         number = request.data['rank']
         origin_rank = rank.rank
@@ -95,16 +93,10 @@ def movie_rank(request, movie_pk):
         data = {
             'rank': number
         }
-        return Response(data, status=status.HTTP_205_RESET_CONTENT)
+        return Response(data)
 
-    # 생성
-    elif request.method == 'POST':
-        number = request.POST['rank']
-        if movie.rank_set.all().filter(user=user).exists():
-            data = {
-                'message': '해당 영화의 평점이 등록되어 있습니다.'
-            }
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        number = request.data['rank']
         
         rank = Rank(user=user, movie=movie, rank=number)
         rank.save()
