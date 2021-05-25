@@ -74,10 +74,20 @@ export default new Vuex.Store({
     },
     MODAL_OFF (state) {
       state.modalMovieId = null;
+    },
+    SET_MOVIE_RATE (state, params) {
+      for (let i=0; i < state.movieList.length; i++) {
+        const movie = state.movieList[i]
+        if (movie.id === params.movieId) {
+          movie.rank = parseInt(params.rating)
+          return;
+        }
+      }
     }
   },
   actions: {
     getToken: function (context) {
+      console.log('d');
       const token = localStorage.getItem('jwt-token');
       context.commit('TOKEN', token);
     },
@@ -237,8 +247,110 @@ export default new Vuex.Store({
       } else {
         throw new Error(res.status)
       }
+    },
+    setRate: async function (context, params) {
+      const url = context.state.API_ENDPOINT + `api/v1/movie/${params.movieId}/rank/`
+      const data = {
+        rank: String(params.rating)
+      }
+      const res = await fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+        body: JSON.stringify(data)
+      })
+      if (res.status === 201 || res.status === 200) {
+        const result = await res.json()
+        context.commit('SET_MOVIE_RATE', params)
+        return result
+      } else {
+        throw new Error(res.status)
+      }
+    },
+    review_create: async function (context, params) {
+      const url = context.state.API_ENDPOINT + `api/v1/movie/${params.movieId}/review/`
+      const form = params.form
+      const data = {
+        title: form.title.value.trim(),
+        content: form.content.value.trim()
+      }
+      const res = await fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+        body: JSON.stringify(data)
+      })
+      if (res.status === 201) {
+        const result = await res.json()
+        console.log(result)
+        return result
+      } else if (res.status === 400) {
+        const result = await res.json()
+        throw new Error(result.message)
+      } else {
+        throw new Error(res.status)
+      }
+    },
+    getReviewDetail: async function (context, reviewId) {
+      const url = context.state.API_ENDPOINT + `api/v1/review/${reviewId}/`
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        }
+      })
+      if (res.status === 200) {
+        const result = await res.json()
+        return result
+      } else {
+        throw new Error(res.status)
+      }
+    },
+    comment_create: async function (context, params) {
+      const url = context.state.API_ENDPOINT + `api/v1/review/${params.reviewId}/comment/`
+      const form = params.form
+      const data = {
+        content: form.content.value.trim()
+      }
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+        body: JSON.stringify(data)
+      })
+      if (res.status === 201) {
+        const result = await res.json()
+        return result
+      } else if (res.status === 400) {
+        const result = await res.json()
+        throw new Error(result.message)
+      } else {
+        throw new Error(res.status)
+      }
+    },
+    review_like: async function (context, reviewId) {
+      const url = context.state.API_ENDPOINT + `api/v1/review/${reviewId}/like/`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+      })
+      if (res.status === 200) {
+        const result = await res.json()
+        return result
+      } else {
+        throw new Error(res.status)
+      }
     }
-    // starRate: async function (context)
   },
   getters: {
     popularMovieList: function (state) {

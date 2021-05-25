@@ -9,22 +9,29 @@
             <h3>{{ movie.title }}</h3>
             <p>{{ movie.overview }}</p>
         </div>
+        <hr>
+        <div class="star-rating-container">
+            <h3>별점을 선택해주세요.</h3>
+            <StarRating :increment="0.5" :border-width="3" :show-rating="false" :star-size="30" :rating="rating" @rating-selected="setRating"/>
+        </div>
+        <hr>
         <div class="review-header">
             <h4>리뷰 목록</h4>
             <button class="btn form-open" @click="openForm">리뷰 작성</button>
         </div>
         <div class="form-container">
-            <form class="review-form">
-                <input type="text">
-                <textarea name="" id="" cols="30"></textarea>
+            <form class="review-form" @submit.prevent="reviewSubmit">
+                <input type="text" name="title" placeholder="리뷰 제목을 작성하세요. 100자 이내">
+                <textarea name="content" id="content" cols="30" placeholder="리뷰 내용을 작성하세요."></textarea>
+                <button type="submit" class="btn">작성 완료</button>
             </form>
             <div class="close-container">
                 <div class="pin"></div>
                 <button class="btn" @click="closeForm"><i class="fas fa-chevron-up"></i></button>
             </div>
         </div>
-        <div v-if="reviews.length">
-            <div v-for="(review, idx) in reviews" :key="idx">{{ review.title }}</div>
+        <div v-if="reviews.length" class="review-list-container">
+            <ReviewCard v-for="(review, idx) in reviews" :key="idx" :review="review" />
         </div>
         <h4 v-else>아직 작성된 리뷰가 없습니다.</h4>
         
@@ -39,14 +46,22 @@
 </template>
 
 <script>
+import StarRating from 'vue-star-rating'
+import ReviewCard from './ReviewCard.vue'
+
 export default {
   name: 'Modal',
   data: function() {
     return {
       movie: null,
       reviews: null,
-      reviewLoad: false
+      reviewLoad: false,
+      rating: 0,
     }
+  },
+  components: {
+      StarRating,
+      ReviewCard,
   },
   computed: {
       videoSrc: function () {
@@ -72,6 +87,38 @@ export default {
         const formContainer = document.querySelector('.form-container');
         formContainer.style.height = `0`;
         formContainer.classList.remove('open');
+    },
+    setRating: function (rating) {
+        const rating2str = String(rating*2)
+        const params = {
+            movieId: this.movie.id,
+            rating: rating2str
+        }
+        this.$store.dispatch('setRate', params)
+        .catch(err => {
+            alert(err.message + ': 예기치 못한 오류 발생')
+            this.$router.go(this.$router.currentRoute)
+        })
+    },
+    reviewSubmit: function (e) {
+        const params = {
+            movieId: this.movie.id,
+            form: e.target
+        }
+        this.$store.dispatch('review_create', params)
+        .then(res => {
+            this.reviews.unshift(res)
+            this.closeForm()
+        })
+        .catch(err => {
+            if (err.message === '401') {
+                alert('로그인 세션이 만료되었습니다.')
+                this.$store.dispatch('logOut')
+                this.$router.push({ name: 'Login' })
+            } else {
+                alert(err.message)
+            }
+        })
     }
   },
   created: function () {
@@ -79,6 +126,7 @@ export default {
         const movie = this.$store.state.movieList[i]
         if(movie.id == this.$store.state.modalMovieId) {
             this.movie = movie;
+            this.rating = movie.rank / 2
             break;
         }
     }
@@ -186,6 +234,18 @@ export default {
         width: 100%;
         height: 100%;
     }
+    .star-rating-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .star-rating-container > h3 {
+        font-size: 1.3rem;
+        margin: 1em 0;
+        color: #ffd055;
+    }
     .movie-info {
         margin: 1rem;
     }
@@ -223,16 +283,23 @@ export default {
     }
     .review-form {
         padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
     .review-form > textarea,
     .review-form > input {
         width: 100%;
         border-radius: 10px;
         margin: .5rem 0;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
     .review-form > input {
         height: 2rem;
+    }
+    .review-form > textarea {
+        height: 5rem;
     }
     .review-form > *:focus {
         outline: none;
@@ -246,16 +313,6 @@ export default {
         display: flex;
         justify-content: center;
     }
-    .btn {
-        border: none;
-        background-color: white;
-        color: #222;
-        font-size: 1rem;
-        padding: .3rem;
-        border-radius: 100px;
-        transition: .5s;
-        font-weight: 700;
-    }
     .btn.form-open {
         position: absolute;
         right: 10px;
@@ -265,13 +322,6 @@ export default {
         transform: translate3d(0, -50%, 0);
     }
 
-    .btn:hover {
-        background-color: black;
-        color: white;
-    }
-    button > i {
-        pointer-events: none;
-    }
     .close-container {
         position: relative;
         display: flex;
@@ -291,6 +341,13 @@ export default {
         font-size: 20px;
         width: 40px;
         height: 40px;
+    }
+
+    .review-list-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     @keyframes circleMove {

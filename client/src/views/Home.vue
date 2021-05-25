@@ -5,7 +5,7 @@
       <MovieList v-for="(genreObj, idx) in genreMovies" :key="idx" :movies="genreObj.data" :genre="genreObj.name" />
       <Modal v-if="modalMovieId" />
     </div>
-    <div class="loading">
+    <div v-else class="loading">
       <div class="circle"></div>
       <div class="circle"></div>
       <div class="circle"></div>
@@ -28,7 +28,7 @@ export default {
     return {
       listCount: 0,
       loadPopularMovieList: false,
-      loadGenreList: false
+      loadGenreList: false,
     }
   },
   computed: {
@@ -58,7 +58,7 @@ export default {
     },
     randomList: function (movieList) {
       return movieList.length > 20 ? _.sampleSize(movieList, 20) : _.sampleSize(movieList, movieList.length)
-    }
+    },
   },
   created: function () {
     this.$store.dispatch('getMovieList')
@@ -97,33 +97,5 @@ export default {
 .home {
   margin-bottom: 2rem;
 }
-.loading {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.loading > .circle {
-  width: 20px;
-  height: 20px;
-  background: white;
-  margin: .8rem;
-  border-radius: 50%;
-  animation: circleMove infinite alternate .6s;
-}
-.loading > .circle:nth-child(2) {
-  animation-delay: .2s;
-}
-.loading > .circle:nth-child(3) {
-  animation-delay: .4s;
-}
-@keyframes circleMove {
-  from {
-      transform: translate3d(0, 0, 0);
-  }
-  to {
-      transform: translate3d(0, -80%, 0);
-  }
-}
+
 </style>

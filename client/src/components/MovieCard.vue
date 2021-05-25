@@ -31,14 +31,13 @@ export default {
   },
   data: function () {
     return {
-      videoSrc: 'https://www.youtube.com/embed/' + this.movie.trailer + '?autoplay=1&mute=1'
+      videoSrc: 'https://www.youtube.com/embed/' + this.movie.trailer + '?autoplay=1&mute=1',
+      scaleCard: null,
     }
-  },
-  computed: {
-
   },
   methods: {
     mouseEnter: function (e) {
+      if (!this.scaleCard) this.scaleCard = e.target;
       this.$store.dispatch('mouseEnter', e.target);
     },
     mouseLeave: function () {

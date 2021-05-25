@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <router-view style="padding-top: 100px;"/>
+    <router-view style="padding: 100px 0;"/>
     <footer v-if="login">
       © 2021, movwe
     </footer>
@@ -46,10 +46,6 @@ export default {
       if (this.$router.currentRoute.name !== 'Login'){
         this.$router.push({name: 'Login'})
       }
-    } else {
-      if (this.$router.currentRoute.name !== 'Home'){
-        this.$router.push({name: 'Home'})
-      }
     }
   },
   methods: {
@@ -78,17 +74,20 @@ body {
   background-color: #222;
   color: #e0dfdf;
   font-family: 'Noto Sans KR', sans-serif;
+  position: relative;
+  min-height: 100vh;
 }
 body.modal-open {
   overflow: hidden;
-  position: relative;
+  
 }
-body.modal-open > #app {
 
-}
 #app {
   /* text-align: center; */
-  /* position: relative; */
+}
+
+#app a {
+  text-decoration: none;
 }
 
 #nav {
@@ -135,6 +134,56 @@ body.modal-open > #app {
 
 }
 
+.loading {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loading > .circle {
+  width: 20px;
+  height: 20px;
+  background: white;
+  margin: .8rem;
+  border-radius: 50%;
+  animation: circleMove infinite alternate .6s;
+}
+.loading > .circle:nth-child(2) {
+  animation-delay: .2s;
+}
+.loading > .circle:nth-child(3) {
+  animation-delay: .4s;
+}
+@keyframes circleMove {
+  from {
+      transform: translate3d(0, 0, 0);
+  }
+  to {
+      transform: translate3d(0, -80%, 0);
+  }
+}
+.btn {
+  border: none;
+  background-color: white;
+  color: #222;
+  font-size: 1rem;
+  padding: .3rem;
+  border-radius: 100px;
+  transition: .5s;
+  font-weight: 700;
+}
+.btn:hover {
+  background-color: black;
+  color: white;
+}
+button > i {
+  pointer-events: none;
+}
+textarea {
+  resize: none;
+}
+
 footer {
   width: 100%;
   height: 4rem;
@@ -143,5 +192,8 @@ footer {
   align-items: center;
   background-color: black;
   z-index: 0;
+  position: absolute;
+  left: 0;
+  bottom: 0;
 }
 </style>
