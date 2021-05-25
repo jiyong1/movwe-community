@@ -56,6 +56,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     user_flag = serializers.SerializerMethodField('user_valid', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
 
     def user_valid(self, comment):
         user = self.context.get('user')
@@ -71,9 +72,19 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
     like_count = serializers.IntegerField(source='like_users.count', read_only=True)
+    user_like = serializers.SerializerMethodField('userlike', read_only=True)
     rank = serializers.SerializerMethodField('rank_query', read_only=True)
     comment_set = CommentSerializer(many=True, read_only=True)
     user_flag = serializers.SerializerMethodField('user_valid', read_only=True)
+    movie = serializers.CharField(source='movie.title', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    def userlike (self, review):
+        user = self.context.get('user')
+        if review.like_users.filter(pk=user.pk).exists():
+            return True
+        else:
+            return False
 
     def rank_query(self, review):
         qs = Rank.objects.get(movie=review.movie, user=review.user)
