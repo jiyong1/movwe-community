@@ -47,6 +47,7 @@ export default {
     },
   },
   created: function () {
+    window.scrollTo(0, 0);
     if (this.$store.state.movieList.length === 0) {
         this.$store.dispatch('getMovieList')
       .then(() => {
