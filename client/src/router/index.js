@@ -9,6 +9,7 @@ import ReviewFormRouter from '../views/ReviewFormRouter.vue'
 import ReviewList from '../views/ReviewList.vue'
 import MoviePick from '../views/MoviePick.vue'
 import MovieRecommend from '../views/MovieRecommend.vue'
+import Search from '../views/Search.vue'
 
 Vue.use(VueRouter)
 
@@ -57,6 +58,11 @@ const routes = [
     path: '/recommend',
     name: 'MovieRecommend',
     component: MovieRecommend
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: Search
   }
 ]
 

@@ -1,6 +1,7 @@
 <template>
   <div class="home">
     <div v-if="loadPopularMovieList && loadGenreList">
+      <HomeMain />
       <MovieList :movies="popularMovies" />
       <MovieList v-for="(genreObj, idx) in genreMovies" :key="idx" :movies="genreObj.data" :genre="genreObj.name" />
       <Modal v-if="modalMovieId" />
@@ -14,6 +15,7 @@
 </template>
 
 <script>
+import HomeMain from '@/components/HomeMain.vue'
 import MovieList from '@/components/MovieList.vue'
 import Modal from '@/components/Modal.vue'
 import _ from 'lodash'
@@ -22,7 +24,8 @@ export default {
   name: 'Home',
   components: {
     MovieList,
-    Modal
+    Modal,
+    HomeMain,
   },
   data: function () {
     return {

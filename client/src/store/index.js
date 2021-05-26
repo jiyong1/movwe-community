@@ -98,6 +98,21 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    searchDetail: async function (context, query) {
+      const url = context.state.API_ENDPOINT + `api/v1/search?q=${query}`
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+      });
+      if (res.status === 200) {
+        const result = await res.json()
+        return result
+      } else {
+        throw new Error(res.status)
+      }
+    },
     searchPreview: async function (context, query) {
       const url = context.state.API_ENDPOINT + `api/v1/search/preview?q=${query}`
       context.state.searchLoadgin = true
@@ -129,7 +144,6 @@ export default new Vuex.Store({
       context.commit('RESET_SEARCH')
     },
     getToken: function (context) {
-      console.log('d');
       const token = localStorage.getItem('jwt-token');
       context.commit('TOKEN', token);
     },
@@ -148,7 +162,6 @@ export default new Vuex.Store({
           },
           body: JSON.stringify(data)
         });
-        // console.log(res.status)
         if (res.status === 200) {
           const resdata = await res.json();
           context.commit('LOGIN', resdata);
@@ -156,7 +169,7 @@ export default new Vuex.Store({
           throw new Error('아이디 혹은 비밀번호가 올바르지 않습니다.')
         }
       } catch (err) {
-        console.log(err);
+        console.log(err.message)
         throw err;
       }
     },
@@ -178,7 +191,7 @@ export default new Vuex.Store({
         });
         return res
       } catch (err) {
-        console.log(err)
+        console.log(err.message)
         throw err
       }
     },
@@ -346,7 +359,6 @@ export default new Vuex.Store({
       })
       if (res.status === 201) {
         const result = await res.json()
-        console.log(result)
         return result
       } else if (res.status === 400) {
         const result = await res.json()
@@ -496,7 +508,6 @@ export default new Vuex.Store({
       return state.movieList
     },
     genreMoviesArray: function (state) {
-      console.log('hi')
       const returnArray = []
       state.genreList.forEach(genre => {
         const genreMovies = {

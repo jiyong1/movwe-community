@@ -99,8 +99,12 @@ export default {
   methods: {
     searchSubmit: function () {
       if (!this.movieSearch && !this.genreSearch) {
+        this.$store.dispatch('resetSearch')
         alert('검색결과가 존재하지 않습니다.')
+        return;
       }
+      this.$router.push({ name: 'Search', query: { q: this.query } })
+      // this.$store.dispatch('resetSearch')
     },
     inputChange: function () {
       if(!this.query.trim()){
@@ -201,6 +205,7 @@ body.modal-open {
 }
 .search-icon {
   font-size: 1.4rem;
+  margin: 0 .3rem;
 }
 #nav form:hover > input {
   width: 100px;
@@ -208,7 +213,7 @@ body.modal-open {
 }
 #nav form > .search-container {
   position: absolute;
-  top: 105%;
+  top: 110%;
   right: 0;
   padding: .3rem;
   background-color: white;
