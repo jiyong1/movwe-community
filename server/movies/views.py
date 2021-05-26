@@ -8,6 +8,7 @@ from .models import Movie, Review, Comment, Rank, Genre
 from .serializers import MovieListSerializer, ReviewSerializer, CommentSerializer, ReviewDetailSerializer, GenreSerializer
 from django.db.models import Q
 
+
 @api_view(['GET'])
 # 토큰 기반 인증 중에서 JWT를 활용해서 검증
 # 인증 여부와 관계없이 JWT 토큰이 유효한지(정상인지) 파악
@@ -27,6 +28,18 @@ def movie_one(request, movie_pk):
     movie = get_object_or_404(Movie, pk=movie_pk)
     serializer = MovieListSerializer(movie, context={ 'user' : request.user})
     return Response(serializer.data)
+
+@api_view(['GET'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def movie_pick_list(request):
+    user = request.user
+    if user.pick.all().exists():
+        movies = user.pick.all()
+        serializer = MovieListSerializer(movies, many=True, context= {'user' : request.user})
+        return Response(serializer.data)
+    else:
+        return Response({'message': '존재하지 않습니다.'}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 @authentication_classes([JSONWebTokenAuthentication])
@@ -277,10 +290,63 @@ def movie_recommend(request):
             result_movies.append([movie.pk, score])
         
         result_movies.sort(reverse=True, key=lambda x: x[1])
+        upper15 = result_movies[:15]
+        
+        upper2obj = []
+        for id, score in upper15:
+            movie = Movie.objects.get(pk=id)
+            upper2obj.append(movie)
 
-        return Response(result_movies[:15])
+        serializer = MovieListSerializer(upper2obj, many=True, context={'user': request.user})
+
+        return Response(serializer.data)
     else:
         data = {
             'message': 'rank 하나라도 달고와'
         }
         return Response(data, status.HTTP_403_FORBIDDEN)
+
+@api_view(['GET'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def search_preview(request):
+    query = request.GET.get('q')
+    movie_count = Movie.objects.filter(title__icontains=query).count()
+    genre_count = Genre.objects.filter(name__icontains=query).count()
+    
+    result = {
+        'movie_count': movie_count,
+        'genre_count': genre_count
+    }
+    return Response(result)
+
+@api_view(['GET'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def search_detail(request):
+    query = request.GET.get('q')
+    movies = Movie.objects.filter(title__icontains=query)
+    genres = Genre.objects.filter(name__icontains=query)
+
+    genre_movie_list = []
+    for genre in genres:
+        genre_movies = genre.movie_set.all()
+        
+        for genre_movie in genre_movies:
+            if genre_movie.id in genre_movie_list:
+                continue
+            genre_movie_list.append(genre_movie.id)
+    
+    genre_data = []
+    for movie_id in genre_movie_list:
+        movie = Movie.objects.get(pk=movie_id)
+        genre_serializer = MovieListSerializer(movie, context={'user': request.user})
+        genre_data.append(genre_serializer.data)
+
+    movie_serializer = MovieListSerializer(movies, many=True, context={'user': request.user})
+    
+    result = {
+        'movies': movie_serializer.data,
+        'genres': genre_data
+    }
+    return Response(result)
