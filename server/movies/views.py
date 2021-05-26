@@ -23,6 +23,14 @@ def movie_list(request):
 @api_view(['GET'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
+def movie_one(request, movie_pk):
+    movie = get_object_or_404(Movie, pk=movie_pk)
+    serializer = MovieListSerializer(movie, context={ 'user' : request.user})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def movie_genres(request):
     genres = get_list_or_404(Genre)
     serializer = GenreSerializer(genres, many=True, context={'user': request.user})
@@ -153,7 +161,7 @@ def review_detail(request, review_pk):
         serializer = ReviewDetailSerializer(instance=review, data=request.data, context={'user': request.user})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
+            return Response(serializer.data)
         else:  
             data = {
                 'message': '올바르지 않은 형식입니다.'

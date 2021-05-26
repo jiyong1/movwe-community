@@ -77,6 +77,7 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
     comment_set = CommentSerializer(many=True, read_only=True)
     user_flag = serializers.SerializerMethodField('user_valid', read_only=True)
     movie = serializers.CharField(source='movie.title', read_only=True)
+    movie_id = serializers.IntegerField(source='movie.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
 
     def userlike (self, review):
