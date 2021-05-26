@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="{ name: 'Review', params: { id: review.id } }" class="review-item-container">
+  <div @click="goReviewDetail" class="review-item-container">
       <div class="review-item-header">
           <div class="header-left header-item">
             <h5>{{ review.username }}</h5>
@@ -18,7 +18,7 @@
       <div class="review-item-title">
           {{ review.title }}
       </div>
-  </router-link>
+  </div>
 </template>
 
 <script>
@@ -34,6 +34,11 @@ export default {
     data: function () {
         return {
             date: new Date(this.review.created_at)
+        }
+    },
+    methods: {
+        goReviewDetail: function () {
+            this.$router.push({ name: 'Review', params: { id: this.review.id } })
         }
     },
     computed: {
@@ -64,11 +69,12 @@ export default {
     .review-item-container {
         width: 100%;
         max-width: 1000px;
-        margin: 1rem;
+        margin: 1rem auto;
         border-radius: 10px;
         background-color: white;
         color: black;
         transition: .4s;
+        cursor: pointer;
     }
     .review-item-container:hover .review-item-title {
         text-decoration: underline;

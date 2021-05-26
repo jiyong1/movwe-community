@@ -5,6 +5,8 @@ import Login from '../views/accounts/Login.vue'
 import SignUp from '../views/accounts/SignUp.vue'
 import Review from '../views/Review.vue'
 import Genre from '../views/Genre.vue'
+import ReviewFormRouter from '../views/ReviewFormRouter.vue'
+import ReviewList from '../views/ReviewList.vue'
 
 Vue.use(VueRouter)
 
@@ -34,6 +36,16 @@ const routes = [
     name: 'Genre',
     component: Genre
   },
+  {
+    path: '/movie/:id/review',
+    name: 'ReviewFormRouter',
+    component: ReviewFormRouter
+  },
+  {
+    path: '/movie/:id/reviewlist',
+    name: 'ReviewList',
+    component: ReviewList
+  }
 ]
 
 const router = new VueRouter({

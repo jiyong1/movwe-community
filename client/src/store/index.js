@@ -163,6 +163,21 @@ export default new Vuex.Store({
         }
       }
     },
+    getMovieOne: async function (context, movieId) {
+      const url = context.state.API_ENDPOINT + `api/v1/movie/${movieId}`
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        }
+      })
+      if (res.status === 200) {
+        const result = await res.json()
+        return result;
+      } else {
+        throw new Error(res.status)
+      }
+    },
     getGenreList: async function (context) {
       if (context.state.movieList.length > 0) {
         return
@@ -297,6 +312,29 @@ export default new Vuex.Store({
         throw new Error(res.status)
       }
     },
+    reviewModify: async function (context, params) {
+      const url = context.state.API_ENDPOINT + `api/v1/review/${params.reviewId}/`
+      const form = params.form
+      const data = {
+        title: form.title.value.trim(),
+        content: form.content.value.trim()
+      }
+      const res = await fetch(url, {
+        method: 'PUT',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+        body: JSON.stringify(data)
+      })
+      if (res.status === 200) {
+        const result = await res.json()
+        return result
+      } else {
+        return new Error(res.status)
+      }
+    },
     getReviewDetail: async function (context, reviewId) {
       const url = context.state.API_ENDPOINT + `api/v1/review/${reviewId}/`
       const res = await fetch(url, {
@@ -349,6 +387,36 @@ export default new Vuex.Store({
         return result
       } else {
         throw new Error(res.status)
+      }
+    },
+    review_delete: async function (context, reviewId) {
+      const url = context.state.API_ENDPOINT + `api/v1/review/${reviewId}/`
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+      })
+      if (res.status === 204) {
+        return res
+      } else {
+        const err = res.json()
+        throw new Error(err.message)
+      }
+    },
+    comment_delete: async function (context, commentId) {
+      const url = context.state.API_ENDPOINT + `api/v1/comment/${commentId}/`
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+      })
+      if (res.status === 204) {
+        return res
+      } else {
+        const err = res.json()
+        throw new Error(err.message)
       }
     }
   },

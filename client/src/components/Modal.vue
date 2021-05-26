@@ -32,6 +32,7 @@
         </div>
         <div v-if="reviews.length" class="review-list-container">
             <ReviewCard v-for="(review, idx) in reviews" :key="idx" :review="review" />
+            <button class="btn" @click="goReviewList">리뷰 전체 보기</button>
         </div>
         <h4 v-else>아직 작성된 리뷰가 없습니다.</h4>
         
@@ -103,10 +104,11 @@ export default {
     reviewSubmit: function (e) {
         const params = {
             movieId: this.movie.id,
-            form: e.target
+            form: e.target,
         }
         this.$store.dispatch('review_create', params)
         .then(res => {
+            if(this.reviews.length === 5) this.reviews.pop();
             this.reviews.unshift(res)
             this.closeForm()
         })
@@ -119,6 +121,9 @@ export default {
                 alert(err.message)
             }
         })
+    },
+    goReviewList: function () {
+        this.$router.push({ name: 'ReviewList', params: { id: this.movie.id } })
     }
   },
   created: function () {
@@ -132,7 +137,7 @@ export default {
     }
     this.$store.dispatch('getReviewList', this.movie.id)
     .then(res => {
-        this.reviews = res;
+        this.reviews = res.slice(0, 5);
         this.reviewLoad = true;
     })
     .catch(err => {

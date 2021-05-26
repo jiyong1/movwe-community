@@ -19,9 +19,10 @@
         <div class="detail-content">
             <p>{{ review.content }}</p>
         </div>
-        <div class="user-button-container" v-if="review.user_flag">
-            <button class="modify">수정</button>
-            <button class="delete">삭제</button>
+        <div class="user-button-container">
+            <button class="listBtn" @click="goReviewList">목록으로</button>
+            <button class="modify" @click="modifyReview" v-if="review.user_flag">수정</button>
+            <button class="delete" @click="deleteReview" v-if="review.user_flag">삭제</button>
         </div>
         <div class="comment-header">
             <h3>댓글 목록 ({{ review.comment_set.length }})</h3>
@@ -41,6 +42,7 @@
             <div v-for="(comment, idx) in review.comment_set" :key="idx" class="comment-item">
                 <div>{{ comment.username }}</div>
                 <div>{{ comment.content }}</div>
+                <button :data-idx="idx" :data-comment="comment.id" @click="deleteComment" class="comment-delete-button" v-if="comment.user_flag"><i class="fas fa-times"></i></button>
             </div>
         </div>
         <div v-else style="display: flex; justify-content: center;">
@@ -70,6 +72,9 @@ export default {
         }
     },
     methods: {
+        goReviewList: function () {
+            this.$router.push({ name: 'ReviewList', params: { id: this.review.movie_id } })
+        },
         openForm: function () {
             const formContainer = document.querySelector('.form-container');
             let height = 0;
@@ -126,6 +131,35 @@ export default {
                     alert(err.message)
                 }
             })
+        },
+        modifyReview: function () {
+            this.$router.push({ name: 'ReviewFormRouter', params: { id: this.review.movie_id }, query: { reviewid: this.review.id } })
+        },
+        deleteReview: function () {
+            if (confirm('리뷰를 삭제하시겠습니까?')) {
+                this.$store.dispatch('review_delete', this.review.id)
+                .then(() => {
+                    alert('정상적으로 삭제되었습니다.')
+                    this.$router.push({ name: 'ReviewList', params: { id: this.review.movie_id } })
+                })
+                .catch(err => {
+                    alert(err.message)
+                })
+            }
+        },
+        deleteComment: function (e) {
+            const commentId = e.target.dataset.comment
+            const commentIdx = e.target.dataset.idx
+            if (confirm('댓글을 삭제하시겠습니까?')) {
+                this.$store.dispatch('comment_delete', commentId)
+                .then(() => {
+                    this.review.comment_set.splice(commentIdx, 1)
+                    alert('정상적으로 삭제되었습니다.')
+                })
+                .catch(err => {
+                    alert(err.message)
+                })
+            }
         }
     },
     created: function () {
@@ -227,16 +261,22 @@ h3 {
     background-color: #adb5bd
 }
 .user-button-container > button:nth-child(2) {
+    background-color: #ffc107
+}
+.user-button-container > button:nth-child(3) {
     background-color: #dc3545
 }
 .user-button-container > button:hover {
     background-color: white;
 }
 .user-button-container > .modify:hover {
-    color: #adb5bd
+    color: #ffc107
 }
 .user-button-container > .delete:hover {
     color: #dc3545
+}
+.user-button-container > .listBtn:hover {
+    color: #adb5bd
 }
 .comment-header {
     margin-bottom: .5rem;
@@ -291,6 +331,7 @@ h3 {
     border-radius: 2px;
 }
 .comment-item {
+    position: relative;
     display: flex;
     margin: .5rem;
     background-color: white;
@@ -306,6 +347,27 @@ h3 {
 }
 .comment-item > div:nth-child(2) {
     width: 80%;
+}
+.comment-delete-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    transform: translate3d(50%, -50%, 0);
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    background: #dc3545;
+}
+.comment-delete-button:hover {
+    transition: .5s;
+    color: #dc3545;
+    background: white;
 }
 
 

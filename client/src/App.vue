@@ -1,20 +1,23 @@
 <template>
   <div id="app" :class="{ modal: modalOpened}">
-    <div id="nav" :class="{unlogined : !login}">
-      <h1>movwe</h1>
-      <div v-if="login">
-        <router-link :to="{ name: 'Home' }">Home</router-link> |
-        <div @click="logOut">로그아웃</div>
+    <nav id="nav" :class="{unlogined : !login }">
+      <img src="@/assets/logo.png" alt="" @click="goHome">
+      <div v-if="login" class="nav-container">
+        <div class="nav-right">
+          <div @click="logOut">로그아웃</div>
+        </div>
       </div>
       <div v-else>
-        <div class="sign-btn" @click="goSignUp" v-if="this.$router.currentRoute.name === 'Login'">
-          회원가입
-        </div>
-        <div v-else class="sign-btn" @click="goLogin">
-          로그인
+        <div class="nav-right">
+          <div class="sign-btn" @click="goSignUp" v-if="this.$router.currentRoute.name === 'Login'">
+            회원가입
+          </div>
+          <div v-else class="sign-btn" @click="goLogin">
+            로그인
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
     <router-view style="padding: 100px 0;"/>
     <footer v-if="login">
       © 2021, movwe
@@ -26,6 +29,9 @@
 <script>
 
 export default {
+  image: {
+    logo: './src/assets/logo.png'
+  },
   computed: {
     login: function () {
       return this.$store.state.isLogin;
@@ -48,6 +54,10 @@ export default {
       }
     }
   },
+  mounted: function () {
+    this.setLayout();
+
+  },
   methods: {
     goSignUp: function () {
       this.$router.push({ name: 'SignUp' })
@@ -58,6 +68,15 @@ export default {
     logOut: function () {
       this.$store.dispatch('logOut')
       this.$router.push({ name: 'Login' })
+    },
+    goHome: function () {
+      if (this.$route.name !== 'Home') {
+        this.$router.push({ name: 'Home' })
+      }
+    },
+    setLayout: function () {
+      const size = window.innerWidth;
+      console.log(size);
     }
   }
 }
@@ -92,13 +111,18 @@ body.modal-open {
 
 #nav {
   width: 100%;
-  padding: 1.5rem;
+  height: 100px;
+  padding: 1rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: stretch;
   align-items: center;
   position: fixed;
   z-index: 10;
   background-color: #222;
+}
+#nav img {
+  height: 100%;
+  cursor: pointer;
 }
 
 #nav.unlogined {
@@ -109,6 +133,19 @@ body.modal-open {
   font-size: 2.5rem;
   font-weight: bold;
   color: #BD9ACC
+}
+#nav > .nav-container {
+  width: auto;
+  display: flex;
+  align-items: center;
+}
+.nav-right {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .sign-btn {
