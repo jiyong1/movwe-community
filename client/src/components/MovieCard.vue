@@ -27,7 +27,11 @@
 export default {
   name: 'MovieCard',
   props: {
-    movie: Object
+    movie: Object,
+    index: {
+      type: Number,
+      default: 0
+    }
   },
   data: function () {
     return {
@@ -45,6 +49,9 @@ export default {
     },
     pickClick: function () {
       this.$store.dispatch('pickClick', this.movie.id)
+      .then(res => {
+        this.$emit('pick', this.index, res.pick)
+      })
     },
     modalOpen: function() {
       this.$store.dispatch('modalOpen')

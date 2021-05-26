@@ -13,8 +13,16 @@ export default new Vuex.Store({
     pendingTimeOut: null,
     scaleCard: null,
     modalMovieId: null,
+    movieSearch: null,
+    genreSearch: null,
+    abortController: null,
+    searchLoading: false,
   },
   mutations: {
+    RESET_SEARCH: function (state){
+      state.movieSearch = null
+      state.genreSearch = null
+    },
     TOKEN: function (state, jwtToken) {
       if (jwtToken) {
         state.jwtToken = jwtToken;
@@ -83,9 +91,43 @@ export default new Vuex.Store({
           return;
         }
       }
+    },
+    SEARCH_PREVIEW_RESULT (state, result) {
+      state.movieSearch = result.movie_count
+      state.genreSearch = result.genre_count
     }
   },
   actions: {
+    searchPreview: async function (context, query) {
+      const url = context.state.API_ENDPOINT + `api/v1/search/preview?q=${query}`
+      context.state.searchLoadgin = true
+      if (context.state.abortController){
+        context.state.abortController.abort()
+        context.state.abortController = null
+      }
+      context.state.abortController = new AbortController()
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+      });
+      
+      if (res.status === 200) {
+        const result = await res.json()
+        context.commit('SEARCH_PREVIEW_RESULT', result)
+        context.state.abortController = null;
+        context.state.searchLoading = false
+        return result
+      } else {
+        context.state.abortController = null;
+        context.state.searchLoading = false;
+        throw new Error(res.status)
+      }
+    },
+    resetSearch: function (context) {
+      context.commit('RESET_SEARCH')
+    },
     getToken: function (context) {
       console.log('d');
       const token = localStorage.getItem('jwt-token');
@@ -207,6 +249,7 @@ export default new Vuex.Store({
       })
       if (res.status === 200) {
         context.commit('PICK_CHANGE', movieID);
+        return await res.json()
       } else {
         throw new Error(res.status)
       }
@@ -417,6 +460,34 @@ export default new Vuex.Store({
       } else {
         const err = res.json()
         throw new Error(err.message)
+      }
+    },
+    getMoviePick: async function (context) {
+      const url = context.state.API_ENDPOINT + `api/v1/movies/pick/`
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+      })
+      if (res.status === 200) {
+        return await res.json()
+      } else {
+        throw new Error(res.status)
+      }
+    },
+    getMovieRecommend: async function (context) {
+      const url = context.state.API_ENDPOINT + `api/v1/movies/recommend/`
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'JWT ' + context.state.jwtToken
+        },
+      })
+      if (res.status === 200) {
+        return await res.json()
+      } else {
+        throw new Error(res.status)
       }
     }
   },

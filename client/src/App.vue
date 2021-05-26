@@ -2,9 +2,31 @@
   <div id="app" :class="{ modal: modalOpened}">
     <nav id="nav" :class="{unlogined : !login }">
       <img src="@/assets/logo.png" alt="" @click="goHome">
+      <div @click="toggleClick" class="toggle" v-if="login"><i class="fas fa-bars fa-lg"></i></div>
       <div v-if="login" class="nav-container">
+        <div class="nav-left">
+          <router-link :to="{ name: 'MoviePick' }" >내가 찜한 목록</router-link>
+          <router-link :to="{ name: 'MovieRecommend' }">영화 추천</router-link>
+        </div>
         <div class="nav-right">
-          <div @click="logOut">로그아웃</div>
+          <form @submit.prevent="searchSubmit">
+            <div class="search-icon"><i class="fas fa-search"></i></div>
+            <input type="text" v-model="query" @focus="searchFocus" @blur="finishSearch" @input="inputChange" placeholder="enter로 제출">
+            <div v-if="search" class="search-container">
+              <div v-if="movieSearch || genreSearch">
+                <div v-if="movieSearch" class="search-box">
+                  {{ query }}(으)로 검색된 영화가 {{ movieSearch }}개 존재합니다.
+                </div>
+                <div v-if="genreSearch" class="search-box">
+                  {{ query }}(으)로 검색된 장르가 {{ genreSearch }}개 존재합니다.
+                </div>
+              </div>
+              <div v-else>
+                검색 결과가 존재하지 않습니다.
+              </div>
+            </div>
+          </form>
+          <div @click="logOut" class="logout">로그아웃</div>
         </div>
       </div>
       <div v-else>
@@ -32,6 +54,13 @@ export default {
   image: {
     logo: './src/assets/logo.png'
   },
+  data: function () {
+    return {
+      toggle: false,
+      query: '',
+      search: false,
+    }
+  },
   computed: {
     login: function () {
       return this.$store.state.isLogin;
@@ -44,6 +73,12 @@ export default {
         document.body.classList.remove('modal-open')
         return false;
       }
+    },
+    movieSearch: function () {
+      return this.$store.state.movieSearch
+    },
+    genreSearch: function () {
+      return this.$store.state.genreSearch
     }
   },
   created: function () {
@@ -56,9 +91,47 @@ export default {
   },
   mounted: function () {
     this.setLayout();
-
+    window.addEventListener('resize', this.setLayout)
+  },
+  updated: function() {
+    this.setLayout();
   },
   methods: {
+    searchSubmit: function () {
+      if (!this.movieSearch && !this.genreSearch) {
+        alert('검색결과가 존재하지 않습니다.')
+      }
+    },
+    inputChange: function () {
+      if(!this.query.trim()){
+        this.$store.dispatch('resetSearch')
+        return;
+      }
+      this.$store.dispatch('searchPreview', this.query)
+    },
+    finishSearch: function () {
+      this.search = false
+      this.$store.dispatch('resetSearch')
+      this.query = ''
+    },
+    searchFocus: function () {
+      this.search = true
+    },
+    toggleClick: function () {
+      const navCon = document.querySelector('.nav-container')
+      if (!this.toggle) {
+        this.toggle = true
+        let nextheight = 0;
+        navCon.childNodes.forEach(node => {
+          const { height } = node.getBoundingClientRect()
+          nextheight += height;
+        })
+        navCon.style.height = `${nextheight}px`;
+      } else {
+        this.toggle = false;
+        navCon.removeAttribute("style")
+      }
+    },
     goSignUp: function () {
       this.$router.push({ name: 'SignUp' })
     },
@@ -75,8 +148,16 @@ export default {
       }
     },
     setLayout: function () {
+      this.toggle = false;
+      const navCon = document.querySelector('.nav-container')
+      if (navCon) document.querySelector('.nav-container').removeAttribute('style')
       const size = window.innerWidth;
-      console.log(size);
+      const nav = document.querySelector('#nav');
+      if (size < 600) {
+        nav.classList.add('short')
+      } else {
+        nav.classList.remove('short')
+      }
     }
   }
 }
@@ -100,7 +181,45 @@ body.modal-open {
   overflow: hidden;
   
 }
-
+#nav form {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+  position: relative;
+}
+#nav form > input {
+  transition: .5s;
+  width: 0;
+  padding: 0;
+  border-radius: 2px;
+  border: none;
+}
+#nav form > input:focus {
+  outline: none;
+  width: 100px;
+  padding: .2rem;
+}
+.search-icon {
+  font-size: 1.4rem;
+}
+#nav form:hover > input {
+  width: 100px;
+  padding: .2rem;
+}
+#nav form > .search-container {
+  position: absolute;
+  top: 105%;
+  right: 0;
+  padding: .3rem;
+  background-color: white;
+  color: black;
+  border-radius: 3px;
+  min-width: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 #app {
   /* text-align: center; */
 }
@@ -112,7 +231,7 @@ body.modal-open {
 #nav {
   width: 100%;
   height: 100px;
-  padding: 1rem;
+  padding: 10px;
   display: flex;
   justify-content: stretch;
   align-items: center;
@@ -123,6 +242,7 @@ body.modal-open {
 #nav img {
   height: 100%;
   cursor: pointer;
+  margin-right: 1rem;
 }
 
 #nav.unlogined {
@@ -147,7 +267,54 @@ body.modal-open {
   display: flex;
   align-items: center;
 }
-
+.toggle {
+  display: none;
+  font-size: 1.3rem;
+  position: absolute;
+  right: 10px;
+  top: 0;
+  height: 100%;
+  cursor: pointer;
+}
+#nav.short > .nav-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  z-index: 0;
+  position: absolute;
+  top: 100%;
+  overflow: hidden;
+  background-color: #222;
+  transition: .5s;
+  height: 0;
+}
+#nav.short form {
+  display: none !important
+}
+#nav.short > .nav-container > * {
+  padding: 0;
+}
+#nav.short > .nav-container > * > * {
+  display: flex;
+  justify-content: center;
+  margin: .5rem 0;
+  padding: .3rem;
+}
+#nav.short > .nav-container > .nav-right {
+  position: static;
+  display: block;
+  height: auto;
+}
+#nav.short > .toggle {
+  display: flex;
+  align-items: center;
+}
+.logout {
+  cursor: pointer;
+}
+.logout:hover {
+  text-decoration: underline;
+}
 .sign-btn {
   padding: .7em;
   background: white;
@@ -165,10 +332,14 @@ body.modal-open {
 
 #nav a {
   font-weight: bold;
+  color: white;
+  margin-right: .7rem;
+  letter-spacing: -1px;
 }
 
 #nav a.router-link-exact-active {
-
+  color: #999;
+  border-bottom: 3px solid #999;
 }
 
 .loading {

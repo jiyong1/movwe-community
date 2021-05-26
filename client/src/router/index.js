@@ -7,6 +7,8 @@ import Review from '../views/Review.vue'
 import Genre from '../views/Genre.vue'
 import ReviewFormRouter from '../views/ReviewFormRouter.vue'
 import ReviewList from '../views/ReviewList.vue'
+import MoviePick from '../views/MoviePick.vue'
+import MovieRecommend from '../views/MovieRecommend.vue'
 
 Vue.use(VueRouter)
 
@@ -45,6 +47,16 @@ const routes = [
     path: '/movie/:id/reviewlist',
     name: 'ReviewList',
     component: ReviewList
+  },
+  {
+    path: '/mypick',
+    name: 'MoviePick',
+    component: MoviePick
+  },
+  {
+    path: '/recommend',
+    name: 'MovieRecommend',
+    component: MovieRecommend
   }
 ]
 
