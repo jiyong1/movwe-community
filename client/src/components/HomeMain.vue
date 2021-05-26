@@ -51,7 +51,7 @@ export default {
             }
             main.setAttribute('id', `section-${this.sectionNum}`);
             if(this.sectionNum === 4) {
-                this.canvasInterval = setInterval(this.draw, 1100/30)
+                this.canvasInterval = setInterval(this.draw, 1000/30)
                 this.sectionNum = 0;
             }
             this.sectionNum ++;
@@ -60,7 +60,7 @@ export default {
     watch: {
         loadImg: function () {
             if(this.loadImg === 30) {
-                this.interval = setInterval(this.anime, 2000)
+                this.interval = setInterval(this.anime, 2500)
             }
         }
     },
@@ -100,12 +100,12 @@ export default {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background: #3A3635;
+        background: #111;
     }
     canvas {
         display: none;
         /* opacity: 0; */
-        background: #3A3635;
+        background: #111;
     }
     .home-main > div {
         /* transition: .5s; */
@@ -115,19 +115,19 @@ export default {
     }
     #section-1 > div:nth-child(1) {
         display: block;
-        animation: fadeInOut 2s forwards;
+        animation: fadeInOut 2.5s forwards;
     }
     #section-2 > div:nth-child(2) {
         display: block;
-        animation: fadeInOut 2s forwards;
+        animation: fadeInOut 2.5s forwards;
     }
     #section-3 > div:nth-child(3) {
         display: block;
-        animation: fadeInOut 2s forwards;
+        animation: fadeInOut 2.5s forwards;
     }
     #section-4 > canvas {
         display: block;
-        animation: forcanvas 2s forwards;
+        animation: forcanvas 2.5s forwards;
     }
 
     @keyframes fadeInOut {

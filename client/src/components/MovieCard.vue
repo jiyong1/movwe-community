@@ -49,8 +49,8 @@ export default {
     },
     pickClick: function () {
       this.$store.dispatch('pickClick', this.movie.id)
-      .then(res => {
-        this.movie.user_picked = !this.movie.user_picked
+      .then((res) => {
+        // this.movie.user_picked = !this.movie.user_picked
         this.$emit('pick', this.index, res.pick)
       })
     },
