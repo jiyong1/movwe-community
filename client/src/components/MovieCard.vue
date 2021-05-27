@@ -7,11 +7,15 @@
           <iframe :data-src="videoSrc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>
         </div>
         <div class="detail-description">
+          <div class="rating-container">
+            <StarRating :increment="0.5" :star-size="25" :read-only="true" :rating="movie.vote_average/2" :show-rating="false"/>
+            <div>{{ movieRateRounded }}</div>
+          </div>
           <div class="header">
             <h3>{{ movie.title }}</h3>
             <div class="button-container">
               <button @click="pickClick">
-                <i class="fas fa-check" v-if="movie.user_picked"></i>
+                <i class="fas fa-check" v-if="picked"></i>
                 <i class="fas fa-plus" v-else></i>
               </button>
               <button @click="modalOpen"><i class="fas fa-info"></i></button>
@@ -24,8 +28,12 @@
 </template>
 
 <script>
+import StarRating from 'vue-star-rating'
 export default {
   name: 'MovieCard',
+  components: {
+    StarRating
+  },
   props: {
     movie: Object,
     index: {
@@ -39,6 +47,15 @@ export default {
       scaleCard: null,
     }
   },
+  computed: {
+    movieRateRounded: function () {
+      return this.movie.vote_average.toFixed(1)
+    },
+    picked: function () {
+      return this.movie.user_picked
+    }
+  }
+  ,
   methods: {
     mouseEnter: function (e) {
       if (!this.scaleCard) this.scaleCard = e.target;
@@ -47,11 +64,11 @@ export default {
     mouseLeave: function () {
       this.$store.dispatch('mouseLeave')
     },
-    pickClick: function () {
+    pickClick: function (e) {
       this.$store.dispatch('pickClick', this.movie.id)
       .then((res) => {
         // this.movie.user_picked = !this.movie.user_picked
-        this.$emit('pick', this.index, res.pick)
+        this.$emit('pick', this.index, res.pick, e.target)
       })
     },
     modalOpen: function() {
@@ -123,6 +140,16 @@ export default {
    display: flex;
    justify-content: space-between;
    align-items: center;
+ }
+ .rating-container {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: 1rem auto;
+ }
+ .rating-container > div {
+   font-size: 1.2rem;
+   margin-left: 0.6rem;
  }
   .button-container {
     min-width: 30%;

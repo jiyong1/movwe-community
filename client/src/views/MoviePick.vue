@@ -37,7 +37,6 @@ export default {
     methods: {
         pick: function (index, pick) {
             this.movies[index].user_picked = pick
-            this.movies.splice(index, 1)
         }
     },
     computed: {

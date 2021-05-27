@@ -3,15 +3,15 @@
     <div v-if="movies_movies.length || genres_movies.length">
         <h2>"{{ query }}" 영화 검색 결과</h2>
         <div v-if="movies_movies.length">
-            <div class="moviecard-container">
-                <MovieCard v-for="(movie, idx) in movies_movies" :key="idx" :movie="movie"/>
+            <div class="moviecard-container" data-name="movies">
+                <MovieCard v-for="(movie, idx) in movies_movies" :key="idx" :movie="movie" @pick="pick"/>
             </div>
         </div>
         <div v-else style="text-align: center;">"{{ query }}"로 검색된 영화 타이틀이 존재하지 않습니다.</div>
         <h2>"{{ query }}" 장르 검색 결과</h2>
         <div v-if="genres_movies.length">
-            <div class="moviecard-container">
-                <MovieCard v-for="(movie, idx) in genres_movies" :key="idx" :movie="movie"/>
+            <div class="moviecard-container" data-name="genres">
+                <MovieCard v-for="(movie, idx) in genres_movies" :key="idx" :movie="movie" @pick="pick"/>
             </div>
         </div>
         <div v-else style="text-align: center;">"{{ query }}"로 검색된 장르가 존재하지 않습니다.</div>
@@ -50,8 +50,16 @@ export default {
         }
     },
     methods: {
-        pick: function (index, pick) {
-            console.log(event.target, index, pick)
+        pick: function (index, pick, target) {
+            let current = target
+            while(!current.matches('.card-root')) {
+                current = current.parentNode
+            }
+            const dataName = current.parentNode.dataset.name
+            if (dataName === 'movies') {
+                this.movies_movies[index].user_picked = pick
+            }
+            console.log(current.parentNode, index, pick)
         },
         getMovies: function() {
             this.$store.dispatch('modalOff')
@@ -61,7 +69,7 @@ export default {
                 this.movies_movies = res.movies
                 this.genres_movies = res.genres
             })
-        }
+        },
     },
     computed: {
         modalMovieId: function () {

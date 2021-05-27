@@ -36,6 +36,10 @@ export default {
         const movieId = this.$route.params.id
         this.$store.dispatch('getReviewList', movieId)
         .then(res => {
+            if (!res.length) {
+                alert('해당 영화의 리뷰가 존재하지 않습니다')
+                this.$router.push({ name: 'Home' })
+            }
             this.reviews = res;
         })
         .catch(err => {

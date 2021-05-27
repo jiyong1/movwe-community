@@ -1,8 +1,13 @@
 <template>
   <div class="home-main">
-      <div>영화에 의한</div>
-      <div>영화를 위한</div>
-      <div>세상을 만들어 갑니다.</div>
+      <div v-if="loading">영화에 의한</div>
+      <div v-if="loading">영화를 위한</div>
+      <div v-if="loading">세상을 만들어 갑니다.</div>
+      <div v-else class="loading">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+      </div>
       <canvas width="1850" height="750"></canvas>
   </div>
 </template>
@@ -20,6 +25,7 @@ export default {
             interval: null,
             canvasInterval: null,
             sectionNum: 1,
+            loading: false,
         }
     },
     methods: {
@@ -60,6 +66,7 @@ export default {
     watch: {
         loadImg: function () {
             if(this.loadImg === 30) {
+                this.loading = true
                 this.interval = setInterval(this.anime, 2500)
             }
         }
@@ -112,6 +119,9 @@ export default {
         font-size: 8vw;
         color: #BD9ACC;
         display: none;
+    }
+    .loading {
+        display: flex !important;
     }
     #section-1 > div:nth-child(1) {
         display: block;

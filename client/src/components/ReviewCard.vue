@@ -6,7 +6,7 @@
             {{presentDay}}
           </div>
           <div class="header-right header-item">
-              <StarRating :star-size="15" :read-only="true" :rating="review.rank/2" :show-rating="false"/>
+              <StarRating :star-size="15" :read-only="true" :rating="review.rank/2" :show-rating="false" :increment="0.5"/>
               <div>
                   좋아요 {{ review.like_count }}
               </div>
@@ -33,7 +33,6 @@ export default {
     },
     data: function () {
         return {
-            date: new Date(this.review.created_at)
         }
     },
     methods: {
@@ -42,6 +41,9 @@ export default {
         }
     },
     computed: {
+        date: function () {
+            return new Date(this.review.created_at)
+        },
         presentDay: function () {
             const nowDate = new Date()
             let hour = nowDate.getHours() - this.date.getHours()

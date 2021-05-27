@@ -288,6 +288,7 @@ body.modal-open {
   z-index: 0;
   position: absolute;
   top: 100%;
+  left: 0;
   overflow: hidden;
   background-color: #222;
   transition: .5s;
